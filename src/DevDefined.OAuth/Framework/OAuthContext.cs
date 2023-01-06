@@ -370,10 +370,6 @@ public class OAuthContext : IOAuthContext
 			allParameters.AddRange(AuthorizationHeaderParameters.ToQueryParametersExcludingTokenSecret()
 				.Where(q => q.Key != Parameters.Realm));
 
-		// patch from http://code.google.com/p/devdefined-tools/issues/detail?id=10
-		//if(RawContent != null)
-		//    allParameters.Add(new QueryParameter("raw", RawContent));
-
 		allParameters.RemoveAll(param => param.Key == Parameters.OAuth_Signature);
 
 		var signatureBase =

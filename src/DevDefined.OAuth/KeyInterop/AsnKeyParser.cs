@@ -141,7 +141,6 @@ public class AsnKeyParser
 		if (parser.IsNextNull())
 		{
 			parser.NextNull();
-			// Also OK: value = parser.Next();
 		}
 		else
 		{
@@ -250,7 +249,6 @@ public class AsnKeyParser
 		if (parser.IsNextNull())
 		{
 			parser.NextNull();
-			// Also OK: value = parser.Next();
 		}
 		else
 		{

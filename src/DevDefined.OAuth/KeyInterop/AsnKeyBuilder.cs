@@ -41,7 +41,6 @@ internal class AsnKeyBuilder
                 if (null == m_octets) { return 0; }
                 return m_octets.Length;
             }
-            // set { m_length = value; }
         }
 
         public AsnMessage(byte[] octets, String format)
@@ -106,7 +105,6 @@ internal class AsnKeyBuilder
                     return EMPTY;
                 return m_tag;
             }
-            // set { m_tag = value; }
         }
 
         private byte[] m_length;
@@ -118,7 +116,6 @@ internal class AsnKeyBuilder
                     return EMPTY;
                 return m_length;
             }
-            // set { m_length = value; }
         }
 
         private byte[] m_octets;
@@ -274,7 +271,6 @@ internal class AsnKeyBuilder
     public static AsnMessage PublicKeyToX509(DSAParameters publicKey)
     {
         // Value Type cannot be null
-        // Debug.Assert(null != publicKey);
 
         /* *
   * SEQUENCE              // PrivateKeyInfo
@@ -327,7 +323,6 @@ internal class AsnKeyBuilder
     public static AsnMessage PublicKeyToX509(RSAParameters publicKey)
     {
         // Value Type cannot be null
-        // Debug.Assert(null != publicKey);
 
         /* *
   * SEQUENCE              // PrivateKeyInfo
@@ -373,7 +368,6 @@ internal class AsnKeyBuilder
     public static AsnMessage PrivateKeyToPKCS8(DSAParameters privateKey)
     {
         // Value Type cannot be null
-        // Debug.Assert(null != privateKey);
 
         /* *
   * SEQUENCE              // PrivateKeyInfo
@@ -431,7 +425,6 @@ internal class AsnKeyBuilder
     public static AsnMessage PrivateKeyToPKCS8(RSAParameters privateKey)
     {
         // Value Type cannot be null
-        // Debug.Assert(null != privateKey);
 
         /* *
   * SEQUENCE                  // PublicKeyInfo
