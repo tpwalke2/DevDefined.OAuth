@@ -32,7 +32,7 @@ internal class AsnKeyBuilder
     public class AsnMessage
     {
         private byte[] m_octets;
-        private String m_format;
+        private string m_format;
 
         public int Length
         {
@@ -43,7 +43,7 @@ internal class AsnKeyBuilder
             }
         }
 
-        public AsnMessage(byte[] octets, String format)
+        public AsnMessage(byte[] octets, string format)
         {
             m_octets = octets;
             m_format = format;
@@ -56,7 +56,7 @@ internal class AsnKeyBuilder
 
             return m_octets;
         }
-        public String GetFormat()
+        public string GetFormat()
         { return m_format; }
     }
 
@@ -722,7 +722,7 @@ internal class AsnKeyBuilder
     /// <seealso cref="CreateOctetString(AsnType)"/>
     /// <seealso cref="CreateOctetString(AsnType[])"/>
     /// <seealso cref="CreateOctetString(String)"/>
-    public static AsnType CreateBitString(String value)
+    public static AsnType CreateBitString(string value)
     {
         if (IsEmpty(value))
         { return CreateBitString(EMPTY); }
@@ -861,7 +861,7 @@ internal class AsnKeyBuilder
     /// <seealso cref="CreateOctetString(byte[])"/>
     /// <seealso cref="CreateOctetString(AsnType)"/>
     /// <seealso cref="CreateOctetString(AsnType[])"/>
-    public static AsnType CreateOctetString(String value)
+    public static AsnType CreateOctetString(string value)
     {
         if (IsEmpty(value))
         { return CreateOctetString(EMPTY); }
@@ -1121,23 +1121,23 @@ internal class AsnKeyBuilder
     /// <code>AsnType oid = CreateOid("1.2.840.113549.1.1.1")</code>
     /// </example>
     /// <seealso cref="CreateOid(byte[])"/>
-    public static AsnType CreateOid(String value)
+    public static AsnType CreateOid(string value)
     {
         // Punt?
         if (IsEmpty(value))
             return null;
 
-        var tokens = value.Split(new Char[] { ' ', '.' });
+        var tokens = value.Split(new char[] { ' ', '.' });
 
         // Punt?
         if (IsEmpty(tokens))
             return null;
 
         // Parsing/Manipulation of the arc value
-        UInt64 a = 0;
+        ulong a = 0;
 
         // One or more strings are available
-        var arcs = new List<UInt64>();
+        var arcs = new List<ulong>();
 
         foreach (var t in tokens)
         {
@@ -1393,7 +1393,7 @@ internal class AsnKeyBuilder
         return false;
     }
 
-    private static bool IsEmpty(String s)
+    private static bool IsEmpty(string s)
     {
         if (null == s || 0 == s.Length)
         { return true; }
@@ -1401,7 +1401,7 @@ internal class AsnKeyBuilder
         return false;
     }
 
-    private static bool IsEmpty(String[] strings)
+    private static bool IsEmpty(string[] strings)
     {
         if (null == strings || 0 == strings.Length)
             return true;

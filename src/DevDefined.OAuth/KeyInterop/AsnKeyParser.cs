@@ -38,7 +38,7 @@ public class AsnKeyParser
 {
 	private readonly AsnParser parser;
 
-	public AsnKeyParser(String pathname)
+	public AsnKeyParser(string pathname)
 	{
 		using (var reader = new BinaryReader(
 			       new FileStream(pathname, FileMode.Open, FileAccess.Read)))

@@ -35,7 +35,7 @@ public class BodyHashValidationInspector : IContextInspector
 	public void InspectContext(ProviderPhase phase, IOAuthContext context)
 	{
 		if (context.SignatureMethod == SignatureMethod.PlainText ||
-		    String.IsNullOrEmpty(context.BodyHash)) return;
+		    string.IsNullOrEmpty(context.BodyHash)) return;
 
 		if (!string.IsNullOrEmpty(context.BodyHash)
 		    && context.FormEncodedParameters.Count > 0)
