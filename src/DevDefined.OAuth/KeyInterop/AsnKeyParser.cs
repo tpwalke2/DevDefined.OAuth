@@ -40,13 +40,12 @@ public class AsnKeyParser
 
 	public AsnKeyParser(string pathname)
 	{
-		using (var reader = new BinaryReader(
-			       new FileStream(pathname, FileMode.Open, FileAccess.Read)))
-		{
-			var info = new FileInfo(pathname);
+		using var reader = new BinaryReader(
+			new FileStream(pathname, FileMode.Open, FileAccess.Read));
 
-			parser = new AsnParser(reader.ReadBytes((int) info.Length));
-		}
+		var info = new FileInfo(pathname);
+
+		parser = new AsnParser(reader.ReadBytes((int) info.Length));
 	}
 
 	public AsnKeyParser(byte[] contents)

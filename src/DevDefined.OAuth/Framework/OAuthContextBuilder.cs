@@ -101,10 +101,9 @@ public class OAuthContextBuilder : IOAuthContextBuilder
 
 	public virtual IOAuthContext FromWebRequest(HttpWebRequest request, Stream rawBody)
 	{
-		using (var reader = new StreamReader(rawBody))
-		{
-			return FromWebRequest(request, reader.ReadToEnd());
-		}
+		using var reader = new StreamReader(rawBody);
+
+		return FromWebRequest(request, reader.ReadToEnd());
 	}
 
 	public virtual IOAuthContext FromWebRequest(HttpWebRequest request, string body)

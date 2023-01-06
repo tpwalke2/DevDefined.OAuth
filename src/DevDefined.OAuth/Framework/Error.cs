@@ -76,14 +76,13 @@ public static class Error
 
         if (response != null)
         {
-            using (var reader = new StreamReader(innerException.Response.GetResponseStream()))
-            {
-                var body = reader.ReadToEnd();
+            using var reader = new StreamReader(innerException.Response.GetResponseStream());
 
-                return
-                    new Exception(
-                        $"Request for uri: {response.ResponseUri} failed.\r\nstatus code: {response.StatusCode}\r\nheaders: {response.Headers}\r\nbody:\r\n{body}", innerException);
-            }
+            var body = reader.ReadToEnd();
+
+            return
+                new Exception(
+                    $"Request for uri: {response.ResponseUri} failed.\r\nstatus code: {response.StatusCode}\r\nheaders: {response.Headers}\r\nbody:\r\n{body}", innerException);
         }
 
         return innerException;

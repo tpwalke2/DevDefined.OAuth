@@ -238,19 +238,17 @@ public class ConsumerRequest : IConsumerRequest
 		{
 			request.ContentType = description.ContentType;
 
-			using (var writer = new StreamWriter(request.GetRequestStream()))
-			{
-				writer.Write(description.Body);
-			}
+			using var writer = new StreamWriter(request.GetRequestStream());
+
+			writer.Write(description.Body);
 		}
 		else if (description.RawBody != null && description.RawBody.Length > 0)
 		{
 			request.ContentType = description.ContentType;
 
-			using (var writer = new BinaryWriter(request.GetRequestStream()))
-			{
-				writer.Write(description.RawBody);
-			}
+			using var writer = new BinaryWriter(request.GetRequestStream());
+
+			writer.Write(description.RawBody);
 		}
 
 		return request;
