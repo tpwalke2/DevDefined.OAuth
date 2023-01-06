@@ -25,9 +25,8 @@
 #endregion
 
 using System;
-using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth;
+namespace DevDefined.OAuth.Framework;
 
 /// <summary>
 /// Generates unique nonces (via Guids) to let the server detect duplicated requests.

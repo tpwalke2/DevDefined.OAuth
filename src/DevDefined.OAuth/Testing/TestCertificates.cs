@@ -24,10 +24,10 @@
 
 #endregion
 
-using System.Security.Cryptography.X509Certificates;
 using DevDefined.OAuth.Framework;
+using System.Security.Cryptography.X509Certificates;
 
-namespace DevDefined.OAuth.Tests;
+namespace DevDefined.OAuth.Testing;
 
 public static class TestCertificates
 {

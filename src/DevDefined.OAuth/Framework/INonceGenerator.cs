@@ -24,9 +24,7 @@
 
 #endregion
 
-using DevDefined.OAuth.Framework;
-
-namespace DevDefined.OAuth;
+namespace DevDefined.OAuth.Framework;
 
 /// <summary>
 /// Generates a nonce, which should be unique for the selected consumer (i.e. never generated

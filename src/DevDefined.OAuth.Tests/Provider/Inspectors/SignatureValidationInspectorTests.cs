@@ -28,6 +28,7 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Framework.Signing;
 using DevDefined.OAuth.Provider.Inspectors;
 using DevDefined.OAuth.Storage;
+using DevDefined.OAuth.Testing;
 using Moq;
 using Xunit;
 
