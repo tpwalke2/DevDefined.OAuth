@@ -27,7 +27,6 @@
 using System;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Net;
 using System.Text;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Utility;

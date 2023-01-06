@@ -25,7 +25,6 @@
 #endregion
 
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using DevDefined.OAuth.Framework;
 
 namespace DevDefined.OAuth.Consumer;
