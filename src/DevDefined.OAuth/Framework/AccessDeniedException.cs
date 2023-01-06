@@ -26,10 +26,12 @@
 
 using System;
 using DevDefined.OAuth.Provider;
+using System.Runtime.Serialization;
 
 namespace DevDefined.OAuth.Framework;
 
-public class AccessDeniedException : Exception
+[Serializable]
+public sealed class AccessDeniedException : Exception
 {
 	private readonly AccessOutcome _outcome;
 
@@ -47,4 +49,6 @@ public class AccessDeniedException : Exception
 	{
 		get { return _outcome; }
 	}
+	
+	private AccessDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) {}
 }
