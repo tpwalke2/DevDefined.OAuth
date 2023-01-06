@@ -57,7 +57,6 @@ public class OAuthContext : IOAuthContext
 	private NameValueCollection _cookies;
 	private NameValueCollection _formEncodedParameters;
 	private NameValueCollection _headers;
-	private string _normalizedRequestUrl;
 	private NameValueCollection _queryParameters;
 	private Uri _rawUri;
 
@@ -155,14 +154,11 @@ public class OAuthContext : IOAuthContext
 				QueryParameters[parameter] = newParameters[parameter];
 			}
 
-			_normalizedRequestUrl = UriUtility.NormalizeUri(_rawUri);
+			NormalizedRequestUrl = UriUtility.NormalizeUri(_rawUri);
 		}
 	}
 
-	public string NormalizedRequestUrl
-	{
-		get { return _normalizedRequestUrl; }
-	}
+	public string NormalizedRequestUrl { get; private set; }
 
 	public string RequestMethod { get; set; }
 

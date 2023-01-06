@@ -67,33 +67,27 @@ internal class AsnKeyBuilder
 
         public AsnType(byte tag, byte octet)
         {
-            m_raw = false;
+            Raw = false;
             m_tag = new byte[] { tag };
             m_octets = new byte[] { octet };
         }
 
         public AsnType(byte tag, byte[] octets)
         {
-            m_raw = false;
+            Raw = false;
             m_tag = new byte[] { tag };
             m_octets = octets;
         }
 
         public AsnType(byte tag, byte[] length, byte[] octets)
         {
-            m_raw = true;
+            Raw = true;
             m_tag = new byte[] { tag };
             m_length = length;
             m_octets = octets;
         }
 
-        private bool m_raw;
-
-        private bool Raw
-        {
-            get { return m_raw; }
-            set { m_raw = value; }
-        }
+        private bool Raw { get; set; }
 
         // Setters and Getters
         private byte[] m_tag;
@@ -136,7 +130,7 @@ internal class AsnKeyBuilder
         {
             // Created raw by user
             // return the bytes....
-            if (true == m_raw)
+            if (true == Raw)
             {
                 return Concatenate(
                     new byte[][] { m_tag, m_length, m_octets }

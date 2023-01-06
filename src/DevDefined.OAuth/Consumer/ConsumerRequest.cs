@@ -37,28 +37,20 @@ namespace DevDefined.OAuth.Consumer;
 
 public class ConsumerRequest : IConsumerRequest
 {
-	private readonly IOAuthConsumerContext _consumerContext;
-	private readonly IOAuthContext _context;
 	private readonly IToken _token;
 
 	public ConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
 	{
-		_context = context ?? throw new ArgumentNullException(nameof(context));
-		_consumerContext = consumerContext ?? throw new ArgumentNullException(nameof(consumerContext));
+		Context = context ?? throw new ArgumentNullException(nameof(context));
+		ConsumerContext = consumerContext ?? throw new ArgumentNullException(nameof(consumerContext));
 		_token = token;
 	}
 
 	private string ResponseBody { get; set; }
 
-	public IOAuthConsumerContext ConsumerContext
-	{
-		get { return _consumerContext; }
-	}
+	public IOAuthConsumerContext ConsumerContext { get; }
 
-	public IOAuthContext Context
-	{
-		get { return _context; }
-	}
+	public IOAuthContext Context { get; }
 
 	public XDocument ToDocument()
 	{
@@ -72,50 +64,50 @@ public class ConsumerRequest : IConsumerRequest
 
 	public RequestDescription GetRequestDescription()
 	{
-		if (string.IsNullOrEmpty(_context.Signature))
+		if (string.IsNullOrEmpty(Context.Signature))
 		{
 			if (_token != null)
 			{
-				_consumerContext.SignContextWithToken(_context, _token);
+				ConsumerContext.SignContextWithToken(Context, _token);
 			}
 			else
 			{
-				_consumerContext.SignContext(_context);
+				ConsumerContext.SignContext(Context);
 			}
 		}
 
-		var uri = _context.GenerateUri();
+		var uri = Context.GenerateUri();
 
 		var description = new RequestDescription
 		{
 			Url = uri,
-			Method = _context.RequestMethod,
+			Method = Context.RequestMethod,
 		};
 
-		if ((_context.FormEncodedParameters != null) && (_context.FormEncodedParameters.Count > 0))
+		if ((Context.FormEncodedParameters != null) && (Context.FormEncodedParameters.Count > 0))
 		{
 			description.ContentType = Parameters.HttpFormEncoded;
-			description.Body = UriUtility.FormatQueryString(_context.FormEncodedParameters.ToQueryParametersExcludingTokenSecret());
+			description.Body = UriUtility.FormatQueryString(Context.FormEncodedParameters.ToQueryParametersExcludingTokenSecret());
 		}
 		else if (!string.IsNullOrEmpty(RequestBody))
 		{
 			description.Body = UriUtility.UrlEncode(RequestBody);
 		}
 
-		else if (_context.RawContent != null)
+		else if (Context.RawContent != null)
 		{
-			description.ContentType = _context.RawContentType;
-			description.RawBody = _context.RawContent;
+			description.ContentType = Context.RawContentType;
+			description.RawBody = Context.RawContent;
 		}
 
-		if (_context.Headers != null)
+		if (Context.Headers != null)
 		{
-			description.Headers.Add(_context.Headers);
+			description.Headers.Add(Context.Headers);
 		}
 
-		if (_consumerContext.UseHeaderForOAuthParameters)
+		if (ConsumerContext.UseHeaderForOAuthParameters)
 		{
-			description.Headers[Parameters.OAuth_Authorization_Header] = _context.GenerateOAuthParametersForHeader();
+			description.Headers[Parameters.OAuth_Authorization_Header] = Context.GenerateOAuthParametersForHeader();
 		}
 
 		return description;
@@ -170,7 +162,7 @@ public class ConsumerRequest : IConsumerRequest
 	public IConsumerRequest SignWithoutToken()
 	{
 		EnsureRequestHasNotBeenSignedYet();
-		_consumerContext.SignContext(_context);
+		ConsumerContext.SignContext(Context);
 		return this;
 	}
 
@@ -182,7 +174,7 @@ public class ConsumerRequest : IConsumerRequest
 	public IConsumerRequest SignWithToken(IToken token)
 	{
 		EnsureRequestHasNotBeenSignedYet();
-		ConsumerContext.SignContextWithToken(_context, token);
+		ConsumerContext.SignContextWithToken(Context, token);
 		return this;
 	}
 
@@ -206,7 +198,7 @@ public class ConsumerRequest : IConsumerRequest
 
 		var request = (HttpWebRequest) WebRequest.Create(description.Url);
 		request.Method = description.Method;
-		request.UserAgent = _consumerContext.UserAgent;
+		request.UserAgent = ConsumerContext.UserAgent;
 
 		if (Timeout.HasValue)
 			request.Timeout = Timeout.Value;
@@ -276,7 +268,7 @@ public class ConsumerRequest : IConsumerRequest
 
 	private void EnsureRequestHasNotBeenSignedYet()
 	{
-		if (!string.IsNullOrEmpty(_context.Signature))
+		if (!string.IsNullOrEmpty(Context.Signature))
 		{
 			throw Error.ThisConsumerRequestHasAlreadyBeenSigned();
 		}

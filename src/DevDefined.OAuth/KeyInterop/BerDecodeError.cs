@@ -34,8 +34,6 @@ namespace DevDefined.OAuth.KeyInterop;
 [Serializable]
 public sealed class BerDecodeException : Exception
 {
-	private readonly int m_position;
-
 	public BerDecodeException()
 	{
 	}
@@ -53,25 +51,22 @@ public sealed class BerDecodeException : Exception
 	public BerDecodeException(String message, int position)
 		: base(message)
 	{
-		m_position = position;
+		Position = position;
 	}
 
 	public BerDecodeException(String message, int position, Exception ex)
 		: base(message, ex)
 	{
-		m_position = position;
+		Position = position;
 	}
 
 	private BerDecodeException(SerializationInfo info, StreamingContext context)
 		: base(info, context)
 	{
-		m_position = info.GetInt32("Position");
+		Position = info.GetInt32("Position");
 	}
 
-	public int Position
-	{
-		get { return m_position; }
-	}
+	public int Position { get; }
 
 	public override string Message
 	{
@@ -80,7 +75,7 @@ public sealed class BerDecodeException : Exception
 			var sb = new StringBuilder(base.Message);
 
 			sb.AppendFormat(" (Position {0}){1}",
-				m_position, Environment.NewLine);
+				Position, Environment.NewLine);
 
 			return sb.ToString();
 		}
@@ -90,6 +85,6 @@ public sealed class BerDecodeException : Exception
 	public override void GetObjectData(SerializationInfo info, StreamingContext context)
 	{
 		base.GetObjectData(info, context);
-		info.AddValue("Position", m_position);
+		info.AddValue("Position", Position);
 	}
 }

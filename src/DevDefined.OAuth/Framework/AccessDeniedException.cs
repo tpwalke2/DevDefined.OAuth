@@ -33,8 +33,6 @@ namespace DevDefined.OAuth.Framework;
 [Serializable]
 public sealed class AccessDeniedException : Exception
 {
-	private readonly AccessOutcome _outcome;
-
 	public AccessDeniedException(AccessOutcome outcome)
 		: this(outcome, null)
 	{
@@ -42,13 +40,10 @@ public sealed class AccessDeniedException : Exception
 
 	public AccessDeniedException(AccessOutcome outcome, string message) : base(message)
 	{
-		_outcome = outcome;
+		Outcome = outcome;
 	}
 
-	public AccessOutcome Outcome
-	{
-		get { return _outcome; }
-	}
-	
+	public AccessOutcome Outcome { get; }
+
 	private AccessDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) {}
 }
