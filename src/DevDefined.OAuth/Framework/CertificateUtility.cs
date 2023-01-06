@@ -46,11 +46,10 @@ namespace DevDefined.OAuth.Framework
 			var parser = new AsnKeyParser(Convert.FromBase64String(privateKey));
 			RSAParameters parameters = parser.ParseRSAPrivateKey();
 			var x509 = new X509Certificate2(Encoding.ASCII.GetBytes(certificate));
+
 			var provider = new RSACryptoServiceProvider();
 			provider.ImportParameters(parameters);
-			x509.PrivateKey = provider;
-
-			return x509;
+			return x509.CopyWithPrivateKey(provider);
 		}
 	}
 }

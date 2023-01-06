@@ -73,7 +73,8 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
       var context = new OAuthContext { XAuthMode = "client_auth", XAuthUsername = "username", XAuthPassword = "password" };
 
       var inspector = new XAuthValidationInspector(ValidateXAuthMode, this.AuthenticateXAuthUsernameAndPassword);
-      Assert.DoesNotThrow(() => inspector.InspectContext(ProviderPhase.CreateAccessToken, context));
+      var ex = Record.Exception(() => inspector.InspectContext(ProviderPhase.CreateAccessToken, context));
+      Assert.Null(ex);
     }
   }
 }

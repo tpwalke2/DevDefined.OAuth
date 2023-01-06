@@ -24,7 +24,6 @@
 
 #endregion
 
-using System.Security.Cryptography.X509Certificates;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Framework.Signing;
 using DevDefined.OAuth.Storage;

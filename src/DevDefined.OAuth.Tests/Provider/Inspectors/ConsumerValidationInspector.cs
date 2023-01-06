@@ -27,7 +27,7 @@
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Provider.Inspectors;
 using DevDefined.OAuth.Storage;
-using Rhino.Mocks;
+using Moq;
 using Xunit;
 
 namespace DevDefined.OAuth.Tests.Provider.Inspectors
@@ -37,15 +37,16 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 		[Fact]
 		public void InValidConsumerThrows()
 		{
-			var consumerStore = MockRepository.GenerateStub<IConsumerStore>();
+			var consumerStore = new Mock<IConsumerStore>();
 
-			var context = new OAuthContext {ConsumerKey = "key"};
+			var context = new OAuthContext { ConsumerKey = "key" };
 
-			consumerStore.Stub(stub => stub.IsConsumer(context)).Return(false);
+			consumerStore.Setup(stub => stub.IsConsumer(context)).Returns(false);
 
-			var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore);
+			var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore.Object);
 
-			var ex = Assert.Throws<OAuthException>(() => inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
+			var ex = Assert.Throws<OAuthException>(() =>
+				inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
 
 			Assert.Equal("Unknown Consumer (Realm: , Key: key)", ex.Message);
 		}
@@ -53,20 +54,15 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 		[Fact]
 		public void ValidConsumerPassesThrough()
 		{
-			var repository = new MockRepository();
+			var consumerStore = new Mock<IConsumerStore>();
+			var context = new OAuthContext { ConsumerKey = "key" };
 
-			var consumerStore = repository.StrictMock<IConsumerStore>();
-			var context = new OAuthContext {ConsumerKey = "key"};
+			consumerStore.Setup(stub => stub.IsConsumer(context)).Returns(true);
 
-			using (repository.Record())
-			{
-				Expect.Call(consumerStore.IsConsumer(context)).Return(true);
-			}
-			using (repository.Playback())
-			{
-				var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore);
-				inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
-			}
+			var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore.Object);
+			inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
+
+			consumerStore.Verify(stub => stub.IsConsumer(context), Times.Once);
 		}
 	}
 }

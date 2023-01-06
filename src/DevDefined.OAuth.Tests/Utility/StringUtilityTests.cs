@@ -28,7 +28,6 @@ using System.Diagnostics;
 using System.Linq;
 using DevDefined.OAuth.Utility;
 using Xunit;
-using Xunit.Extensions;
 
 namespace DevDefined.OAuth.Tests.Utility
 {
