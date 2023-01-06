@@ -31,7 +31,7 @@ namespace DevDefined.OAuth.Utility;
 /// <summary>
 /// A simple class which can be used to generate "unguessable" verifier values.
 /// </summary>
-public class UnguessableGenerator
+public static class UnguessableGenerator
 {
 	private const string AllowableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/^()";
 

@@ -686,6 +686,7 @@ public class BigInteger
 		}
 		catch (Exception)
 		{
+			// ignore exception
 		}
 
 		var result = new BigInteger();
@@ -949,9 +950,9 @@ public class BigInteger
 		return !(bi1.Equals(bi2));
 	}
 
-	public override bool Equals(object o)
+	public override bool Equals(object obj)
 	{
-		var bi = (BigInteger) o;
+		var bi = (BigInteger) obj;
 
 		if (dataLength != bi.dataLength)
 			return false;
@@ -1426,6 +1427,7 @@ public class BigInteger
 			}
 			catch (Exception)
 			{
+				// ignore exception
 			}
 		}
 

@@ -58,6 +58,15 @@ public class DisposableAction : IDisposable
 
 	public void Dispose()
 	{
-		_action();
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
+		{
+			_action();
+		}
 	}
 }

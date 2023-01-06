@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Net;
+using System.Runtime.Serialization;
 
 namespace DevDefined.OAuth.Framework;
 
@@ -7,7 +9,8 @@ namespace DevDefined.OAuth.Framework;
 /// Extends WebException.  Calls to the underlying Response.GetResponseStream() will fail since the response body has already been read, 
 /// so the body is included in the property <see cref="ResponseContent" /> instead.
 /// </summary>
-public class ParsedWebException : WebException
+[Serializable]
+public sealed class ParsedWebException : WebException
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="T:System.Net.WebException"/> class with the specified error message, nested exception, status, and response.
@@ -22,6 +25,8 @@ public class ParsedWebException : WebException
     {
         ResponseContent = content;
     }
+
+    private ParsedWebException(SerializationInfo info, StreamingContext context) : base(info, context) {}
 
     /// <summary>
     /// The response body content

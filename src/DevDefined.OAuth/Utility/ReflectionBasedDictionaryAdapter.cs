@@ -201,7 +201,7 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 
 	#region Nested type: DictionaryEntryEnumeratorAdapter
 
-	private class DictionaryEntryEnumeratorAdapter : IDictionaryEnumerator
+	private sealed class DictionaryEntryEnumeratorAdapter : IDictionaryEnumerator
 	{
 		private readonly IDictionaryEnumerator _enumerator;
 		private KeyValuePair<string, object> _current;

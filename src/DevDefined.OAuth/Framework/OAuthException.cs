@@ -29,7 +29,8 @@ using System.Runtime.Serialization;
 
 namespace DevDefined.OAuth.Framework;
 
-public class OAuthException : Exception
+[Serializable]
+public sealed class OAuthException : Exception
 {
 	public OAuthException()
 	{

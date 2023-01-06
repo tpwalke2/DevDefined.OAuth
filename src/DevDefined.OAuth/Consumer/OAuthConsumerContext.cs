@@ -35,26 +35,15 @@ namespace DevDefined.OAuth.Consumer;
 [Serializable]
 public class OAuthConsumerContext : IOAuthConsumerContext
 {
-	private INonceGenerator _nonceGenerator = new GuidNonceGenerator();
-	private IOAuthContextSigner _signer = new OAuthContextSigner();
-
 	public OAuthConsumerContext()
 	{
 		SignatureMethod = Framework.SignatureMethod.PlainText;
+		Signer = new OAuthContextSigner();
+		NonceGenerator = new GuidNonceGenerator();
 	}
 
-	public IOAuthContextSigner Signer
-	{
-		get => _signer;
-		set => _signer = value;
-	}
-
-	public INonceGenerator NonceGenerator
-	{
-		get => _nonceGenerator;
-		set => _nonceGenerator = value;
-	}
-
+	public IOAuthContextSigner Signer { get; set; }
+	public INonceGenerator NonceGenerator { get; set; }
 	public string Realm { get; set; }
 	public string ConsumerKey { get; set; }
 	public string ConsumerSecret { get; set; }
@@ -68,7 +57,7 @@ public class OAuthConsumerContext : IOAuthConsumerContext
 		EnsureStateIsValid();
 
 		context.UseAuthorizationHeader = UseHeaderForOAuthParameters;
-		context.Nonce = _nonceGenerator.GenerateNonce(context);
+		context.Nonce = NonceGenerator.GenerateNonce(context);
 		context.ConsumerKey = ConsumerKey;
 		context.Realm = Realm;
 		context.SignatureMethod = SignatureMethod;
@@ -79,7 +68,7 @@ public class OAuthConsumerContext : IOAuthConsumerContext
 
 		var signatureBase = context.GenerateSignatureBase();
 
-		_signer.SignContext(context,
+		Signer.SignContext(context,
 			new SigningContext
 				{Algorithm = Key, SignatureBase = signatureBase, ConsumerSecret = ConsumerSecret});
 	}
