@@ -30,39 +30,38 @@ using DevDefined.OAuth.Storage;
 using Moq;
 using Xunit;
 
-namespace DevDefined.OAuth.Tests.Provider.Inspectors
+namespace DevDefined.OAuth.Tests.Provider.Inspectors;
+
+public class ConsumerValidationInspector
 {
-	public class ConsumerValidationInspector
+	[Fact]
+	public void InValidConsumerThrows()
 	{
-		[Fact]
-		public void InValidConsumerThrows()
-		{
-			var consumerStore = new Mock<IConsumerStore>();
+		var consumerStore = new Mock<IConsumerStore>();
 
-			var context = new OAuthContext { ConsumerKey = "key" };
+		var context = new OAuthContext { ConsumerKey = "key" };
 
-			consumerStore.Setup(stub => stub.IsConsumer(context)).Returns(false);
+		consumerStore.Setup(stub => stub.IsConsumer(context)).Returns(false);
 
-			var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore.Object);
+		var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore.Object);
 
-			var ex = Assert.Throws<OAuthException>(() =>
-				inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
+		var ex = Assert.Throws<OAuthException>(() =>
+			inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
 
-			Assert.Equal("Unknown Consumer (Realm: , Key: key)", ex.Message);
-		}
+		Assert.Equal("Unknown Consumer (Realm: , Key: key)", ex.Message);
+	}
 
-		[Fact]
-		public void ValidConsumerPassesThrough()
-		{
-			var consumerStore = new Mock<IConsumerStore>();
-			var context = new OAuthContext { ConsumerKey = "key" };
+	[Fact]
+	public void ValidConsumerPassesThrough()
+	{
+		var consumerStore = new Mock<IConsumerStore>();
+		var context = new OAuthContext { ConsumerKey = "key" };
 
-			consumerStore.Setup(stub => stub.IsConsumer(context)).Returns(true);
+		consumerStore.Setup(stub => stub.IsConsumer(context)).Returns(true);
 
-			var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore.Object);
-			inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
+		var inspector = new OAuth.Provider.Inspectors.ConsumerValidationInspector(consumerStore.Object);
+		inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
 
-			consumerStore.Verify(stub => stub.IsConsumer(context), Times.Once);
-		}
+		consumerStore.Verify(stub => stub.IsConsumer(context), Times.Once);
 	}
 }

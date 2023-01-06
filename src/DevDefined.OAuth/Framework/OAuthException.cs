@@ -27,37 +27,37 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+[Serializable]
+public sealed class OAuthException : Exception
 {
-	public class OAuthException : Exception
+	public OAuthException()
 	{
-		public OAuthException()
-		{
-		}
-
-		public OAuthException(string message, Exception innerException)
-			: base(message, innerException)
-		{
-		}
-
-		public OAuthException(IOAuthContext context, string problem, string advice) : base(advice)
-		{
-			Context = context;
-			Report = new OAuthProblemReport {Problem = problem, ProblemAdvice = advice};
-		}
-
-		public OAuthException(IOAuthContext context, string problem, string advice, Exception innerException)
-			: base(advice, innerException)
-		{
-			Context = context;
-			Report = new OAuthProblemReport {Problem = problem, ProblemAdvice = advice};
-		}
-
-		public OAuthException(SerializationInfo info, StreamingContext context) : base(info, context)
-		{
-		}
-
-		public OAuthProblemReport Report { get; set; }
-		public IOAuthContext Context { get; set; }
 	}
+
+	public OAuthException(string message, Exception innerException)
+		: base(message, innerException)
+	{
+	}
+
+	public OAuthException(IOAuthContext context, string problem, string advice) : base(advice)
+	{
+		Context = context;
+		Report = new OAuthProblemReport {Problem = problem, ProblemAdvice = advice};
+	}
+
+	public OAuthException(IOAuthContext context, string problem, string advice, Exception innerException)
+		: base(advice, innerException)
+	{
+		Context = context;
+		Report = new OAuthProblemReport {Problem = problem, ProblemAdvice = advice};
+	}
+
+	public OAuthException(SerializationInfo info, StreamingContext context) : base(info, context)
+	{
+	}
+
+	public OAuthProblemReport Report { get; set; }
+	public IOAuthContext Context { get; set; }
 }

@@ -24,11 +24,10 @@
 
 #endregion
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+public interface IConsumer
 {
-	public interface IConsumer
-	{
-		string ConsumerKey { get; set; }
-		string Realm { get; set; }
-	}
+	string ConsumerKey { get; set; }
+	string Realm { get; set; }
 }

@@ -26,43 +26,42 @@
 
 using System;
 
-namespace DevDefined.OAuth.Utility
+namespace DevDefined.OAuth.Utility;
+
+/// <summary>
+/// A simple class which can be used to generate "unguessable" verifier values.
+/// </summary>
+public static class UnguessableGenerator
 {
+	private const string AllowableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/^()";
+
 	/// <summary>
-	/// A simple class which can be used to generate "unguessable" verifier values.
+	/// Generates an unguessable string sequence of a certain length
 	/// </summary>
-	public class UnguessableGenerator
+	/// <param name="length"></param>
+	/// <returns></returns>
+	public static string GenerateUnguessable(int length)
 	{
-		const string AllowableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/^()";
+		var random = new Random();
 
-		/// <summary>
-		/// Generates an unguessable string sequence of a certain length
-		/// </summary>
-		/// <param name="length"></param>
-		/// <returns></returns>
-		public static string GenerateUnguessable(int length)
+		var chars = new char[length];
+
+		var allowableLength = AllowableCharacters.Length;
+
+		for (var i = 0; i < length; i++)
 		{
-			var random = new Random();
-
-			var chars = new char[length];
-
-			int allowableLength = AllowableCharacters.Length;
-
-			for (int i = 0; i < length; i++)
-			{
-				chars[i] = AllowableCharacters[random.Next(allowableLength)];
-			}
-
-			return new string(chars);
+			chars[i] = AllowableCharacters[random.Next(allowableLength)];
 		}
 
-		/// <summary>
-		/// Generates an ungessable string, defaults the length to what google uses (24 characters)
-		/// </summary>
-		/// <returns></returns>
-		public static string GenerateUnguessable()
-		{
-			return GenerateUnguessable(24);
-		}
+		return new string(chars);
+	}
+
+	/// <summary>
+	/// Generates an ungessable string, defaults the length to what google uses (24 characters)
+	/// </summary>
+	/// <returns></returns>
+	public static string GenerateUnguessable()
+	{
+		return GenerateUnguessable(24);
 	}
 }

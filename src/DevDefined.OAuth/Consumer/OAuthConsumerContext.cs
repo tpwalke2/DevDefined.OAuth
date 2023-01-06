@@ -30,74 +30,62 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Framework.Signing;
 using DevDefined.OAuth.Utility;
 
-namespace DevDefined.OAuth.Consumer
+namespace DevDefined.OAuth.Consumer;
+
+[Serializable]
+public class OAuthConsumerContext : IOAuthConsumerContext
 {
-	[Serializable]
-	public class OAuthConsumerContext : IOAuthConsumerContext
+	public OAuthConsumerContext()
 	{
-		INonceGenerator _nonceGenerator = new GuidNonceGenerator();
-		IOAuthContextSigner _signer = new OAuthContextSigner();
+		SignatureMethod = Framework.SignatureMethod.PlainText;
+		Signer = new OAuthContextSigner();
+		NonceGenerator = new GuidNonceGenerator();
+	}
 
-		public OAuthConsumerContext()
-		{
-			SignatureMethod = Framework.SignatureMethod.PlainText;
-		}
+	public IOAuthContextSigner Signer { get; set; }
+	public INonceGenerator NonceGenerator { get; set; }
+	public string Realm { get; set; }
+	public string ConsumerKey { get; set; }
+	public string ConsumerSecret { get; set; }
+	public string SignatureMethod { get; set; }
+	public AsymmetricAlgorithm Key { get; set; }
+	public bool UseHeaderForOAuthParameters { get; set; }
+	public string UserAgent { get; set; }
 
-		public IOAuthContextSigner Signer
-		{
-			get { return _signer; }
-			set { _signer = value; }
-		}
+	public void SignContext(IOAuthContext context)
+	{
+		EnsureStateIsValid();
 
-		public INonceGenerator NonceGenerator
-		{
-			get { return _nonceGenerator; }
-			set { _nonceGenerator = value; }
-		}
+		context.UseAuthorizationHeader = UseHeaderForOAuthParameters;
+		context.Nonce = NonceGenerator.GenerateNonce(context);
+		context.ConsumerKey = ConsumerKey;
+		context.Realm = Realm;
+		context.SignatureMethod = SignatureMethod;
+		context.Timestamp = Clock.EpochString;
+		context.Version = "1.0";
 
-		public string Realm { get; set; }
-		public string ConsumerKey { get; set; }
-		public string ConsumerSecret { get; set; }
-		public string SignatureMethod { get; set; }
-		public AsymmetricAlgorithm Key { get; set; }
-		public bool UseHeaderForOAuthParameters { get; set; }
-		public string UserAgent { get; set; }
+		context.Nonce = NonceGenerator.GenerateNonce(context);
 
-		public void SignContext(IOAuthContext context)
-		{
-			EnsureStateIsValid();
+		var signatureBase = context.GenerateSignatureBase();
 
-			context.UseAuthorizationHeader = UseHeaderForOAuthParameters;
-			context.Nonce = _nonceGenerator.GenerateNonce(context);
-			context.ConsumerKey = ConsumerKey;
-			context.Realm = Realm;
-			context.SignatureMethod = SignatureMethod;
-			context.Timestamp = Clock.EpochString;
-			context.Version = "1.0";
+		Signer.SignContext(context,
+			new SigningContext
+				{Algorithm = Key, SignatureBase = signatureBase, ConsumerSecret = ConsumerSecret});
+	}
 
-			context.Nonce = NonceGenerator.GenerateNonce(context);
+	public void SignContextWithToken(IOAuthContext context, IToken token)
+	{
+		context.Token = token.Token;
+		context.TokenSecret = token.TokenSecret;
 
-			string signatureBase = context.GenerateSignatureBase();
+		SignContext(context);
+	}
 
-			_signer.SignContext(context,
-			                    new SigningContext
-			                    	{Algorithm = Key, SignatureBase = signatureBase, ConsumerSecret = ConsumerSecret});
-		}
-
-		public void SignContextWithToken(IOAuthContext context, IToken token)
-		{
-			context.Token = token.Token;
-			context.TokenSecret = token.TokenSecret;
-
-			SignContext(context);
-		}
-
-		void EnsureStateIsValid()
-		{
-			if (string.IsNullOrEmpty(ConsumerKey)) throw Error.EmptyConsumerKey();
-			if (string.IsNullOrEmpty(SignatureMethod)) throw Error.UnknownSignatureMethod(SignatureMethod);
-			if ((SignatureMethod == Framework.SignatureMethod.RsaSha1)
-			    && (Key == null)) throw Error.ForRsaSha1SignatureMethodYouMustSupplyAssymetricKeyParameter();
-		}
+	private void EnsureStateIsValid()
+	{
+		if (string.IsNullOrEmpty(ConsumerKey)) throw Error.EmptyConsumerKey();
+		if (string.IsNullOrEmpty(SignatureMethod)) throw Error.UnknownSignatureMethod(SignatureMethod);
+		if ((SignatureMethod == Framework.SignatureMethod.RsaSha1)
+		    && (Key == null)) throw Error.ForRsaSha1SignatureMethodYouMustSupplyAsymmetricKeyParameter();
 	}
 }

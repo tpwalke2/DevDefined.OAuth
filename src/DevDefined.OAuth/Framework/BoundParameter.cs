@@ -26,72 +26,71 @@
 
 using System.Collections.Specialized;
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+internal class BoundParameter
 {
-	internal class BoundParameter
+	private readonly OAuthContext _context;
+	private readonly string _name;
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="BoundParameter"/> class.
+	/// </summary>
+	/// <param name="name">The name.</param>
+	/// <param name="context">The context.</param>
+	public BoundParameter(string name, OAuthContext context)
 	{
-		readonly OAuthContext _context;
-		readonly string _name;
+		_name = name;
+		_context = context;
+	}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="BoundParameter"/> class.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <param name="context">The context.</param>
-		public BoundParameter(string name, OAuthContext context)
+	/// <summary>
+	/// Gets or sets the value.
+	/// </summary>
+	/// <value>The value.</value>
+	public string Value
+	{
+		get
 		{
-			_name = name;
-			_context = context;
+			if (_context.AuthorizationHeaderParameters[_name] != null)
+				return _context.AuthorizationHeaderParameters[_name];
+
+			if (_context.QueryParameters[_name] != null)
+				return _context.QueryParameters[_name];
+
+			if (_context.FormEncodedParameters[_name] != null)
+				return _context.FormEncodedParameters[_name];
+
+			return null;
 		}
-
-		/// <summary>
-		/// Gets or sets the value.
-		/// </summary>
-		/// <value>The value.</value>
-		public string Value
+		set
 		{
-			get
+			if (value == null)
 			{
-				if (_context.AuthorizationHeaderParameters[_name] != null)
-					return _context.AuthorizationHeaderParameters[_name];
-
-				if (_context.QueryParameters[_name] != null)
-					return _context.QueryParameters[_name];
-
-				if (_context.FormEncodedParameters[_name] != null)
-					return _context.FormEncodedParameters[_name];
-
-				return null;
+				Collection.Remove(_name);
 			}
-			set
+			else
 			{
-				if (value == null)
-				{
-					Collection.Remove(_name);
-				}
-				else
-				{
-					Collection[_name] = value;
-				}
+				Collection[_name] = value;
 			}
 		}
+	}
 
-		/// <summary>
-		/// Gets the collection.
-		/// </summary>
-		/// <value>The collection.</value>
-		NameValueCollection Collection
+	/// <summary>
+	/// Gets the collection.
+	/// </summary>
+	/// <value>The collection.</value>
+	private NameValueCollection Collection
+	{
+		get
 		{
-			get
-			{
-				if (_context.UseAuthorizationHeader)
-					return _context.AuthorizationHeaderParameters;
+			if (_context.UseAuthorizationHeader)
+				return _context.AuthorizationHeaderParameters;
 
-				if (_context.RequestMethod == "GET")
-					return _context.QueryParameters;
+			if (_context.RequestMethod == "GET")
+				return _context.QueryParameters;
 
-				return _context.FormEncodedParameters;
-			}
+			return _context.FormEncodedParameters;
 		}
 	}
 }

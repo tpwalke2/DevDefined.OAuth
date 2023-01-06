@@ -28,72 +28,72 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Framework.Signing;
 using DevDefined.OAuth.Provider.Inspectors;
 using DevDefined.OAuth.Storage;
+using DevDefined.OAuth.Testing;
 using Moq;
 using Xunit;
 
-namespace DevDefined.OAuth.Tests.Provider.Inspectors
+namespace DevDefined.OAuth.Tests.Provider.Inspectors;
+
+public class SignatureValidationInspectorTests
 {
-	public class SignatureValidationInspectorTests
+	[Fact]
+	public void InvalidSignatureThrows()
 	{
-		[Fact]
-		public void InvalidSignatureThrows()
-		{
-			var consumerStore = new Mock<IConsumerStore>();
-			var signer = new Mock<IOAuthContextSigner>();
+		var consumerStore = new Mock<IConsumerStore>();
+		var signer = new Mock<IOAuthContextSigner>();
 
-			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText };
+		var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText };
 
-			signer.Setup(contextSigner => contextSigner.ValidateSignature(
-					It.IsAny<IOAuthContext>(),
-					It.IsAny<SigningContext>()))
-				.Returns(false);
+		signer.Setup(contextSigner => contextSigner.ValidateSignature(
+				It.IsAny<IOAuthContext>(),
+				It.IsAny<SigningContext>()))
+			.Returns(false);
 
-			var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
-			var ex = Assert.Throws<OAuthException>(() =>
-				inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
-			Assert.Equal("Failed to validate signature", ex.Message);
+		var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
+		var ex = Assert.Throws<OAuthException>(() =>
+			inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
+		Assert.Equal("Failed to validate signature", ex.Message);
 			
-			signer.Verify(contextSigner => contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
-		}
+		signer.Verify(contextSigner => contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
+	}
 
-		[Fact]
-		public void PlainTextSignatureMethodDoesNotFetchCertificate()
-		{
-			var consumerStore = new Mock<IConsumerStore>();
-			var signer = new Mock<IOAuthContextSigner>();
+	[Fact]
+	public void PlainTextSignatureMethodDoesNotFetchCertificate()
+	{
+		var consumerStore = new Mock<IConsumerStore>();
+		var signer = new Mock<IOAuthContextSigner>();
 
-			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText };
+		var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText };
 
-			signer.Setup(contextSigner => contextSigner.ValidateSignature(
-					It.IsAny<IOAuthContext>(),
-					It.IsAny<SigningContext>()))
-				.Returns(true);
+		signer.Setup(contextSigner => contextSigner.ValidateSignature(
+				It.IsAny<IOAuthContext>(),
+				It.IsAny<SigningContext>()))
+			.Returns(true);
 
-			var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
-			inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
+		var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
+		inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
 			
-			signer.Verify(contextSigner => contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
-		}
+		signer.Verify(contextSigner => contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
+	}
 
-		[Fact]
-		public void RsaSha1SignatureMethodFetchesCertificate()
-		{
-			var consumerStore = new Mock<IConsumerStore>();
-			var signer = new Mock<IOAuthContextSigner>();
+	[Fact]
+	public void RsaSha1SignatureMethodFetchesCertificate()
+	{
+		var consumerStore = new Mock<IConsumerStore>();
+		var signer = new Mock<IOAuthContextSigner>();
 
-			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.RsaSha1 };
+		var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.RsaSha1 };
 
-			consumerStore.Setup(store => store.GetConsumerPublicKey(context))
-				.Returns(TestCertificates.OAuthTestCertificate().PublicKey.Key);
-			signer.Setup(contextSigner =>
-				contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>())).Returns(true);
+		consumerStore.Setup(store => store.GetConsumerPublicKey(context))
+			.Returns(TestCertificates.OAuthTestCertificate().PublicKey.GetRSAPublicKey);
+		signer.Setup(contextSigner =>
+			contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>())).Returns(true);
 
-			var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
-			inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
+		var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
+		inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
 
-			consumerStore.Verify(store => store.GetConsumerPublicKey(context));
-			signer.Verify(contextSigner =>
-				contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
-		}
+		consumerStore.Verify(store => store.GetConsumerPublicKey(context));
+		signer.Verify(contextSigner =>
+			contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
 	}
 }

@@ -26,20 +26,28 @@
 
 using System;
 
-namespace DevDefined.OAuth.Utility
+namespace DevDefined.OAuth.Utility;
+
+public class DisposableAction : IDisposable
 {
-	public class DisposableAction : IDisposable
+	private readonly Action _action;
+
+	public DisposableAction(Action action)
 	{
-		readonly Action _action;
+		_action = action;
+	}
 
-		public DisposableAction(Action action)
-		{
-			_action = action;
-		}
+	public void Dispose()
+	{
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
 
-		public void Dispose()
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
 		{
-			if (_action != null) _action();
+			_action?.Invoke();
 		}
 	}
 }

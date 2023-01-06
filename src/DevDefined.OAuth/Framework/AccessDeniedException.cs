@@ -26,26 +26,24 @@
 
 using System;
 using DevDefined.OAuth.Provider;
+using System.Runtime.Serialization;
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+[Serializable]
+public sealed class AccessDeniedException : Exception
 {
-	public class AccessDeniedException : Exception
+	public AccessDeniedException(AccessOutcome outcome)
+		: this(outcome, null)
 	{
-		readonly AccessOutcome _outcome;
-
-		public AccessDeniedException(AccessOutcome outcome)
-			: this(outcome, null)
-		{
-		}
-
-		public AccessDeniedException(AccessOutcome outcome, string message) : base(message)
-		{
-			_outcome = outcome;
-		}
-
-		public AccessOutcome Outcome
-		{
-			get { return _outcome; }
-		}
 	}
+
+	public AccessDeniedException(AccessOutcome outcome, string message) : base(message)
+	{
+		Outcome = outcome;
+	}
+
+	public AccessOutcome Outcome { get; }
+
+	private AccessDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) {}
 }

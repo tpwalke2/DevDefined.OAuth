@@ -28,56 +28,54 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Storage;
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+/// <summary>
+/// This inspector implements additional behavior required by the 1.0a version of OAuth.
+/// </summary>
+public class OAuth10AInspector : IContextInspector
 {
-	/// <summary>
-	/// This inspector implements additional behavior required by the 1.0a version of OAuth.
-	/// </summary>
-	public class OAuth10AInspector : IContextInspector
+	private readonly ITokenStore _tokenStore;
+
+	public OAuth10AInspector(ITokenStore tokenStore)
 	{
-		readonly ITokenStore _tokenStore;
+		_tokenStore = tokenStore ?? throw new ArgumentNullException(nameof(tokenStore));
+	}
 
-		public OAuth10AInspector(ITokenStore tokenStore)
+	public void InspectContext(ProviderPhase phase, IOAuthContext context)
+	{
+		if (phase == ProviderPhase.GrantRequestToken)
 		{
-			if (tokenStore == null) throw new ArgumentNullException("tokenStore");
-			_tokenStore = tokenStore;
+			ValidateCallbackUrlIsPartOfRequest(context);
+		}
+		else if (phase == ProviderPhase.ExchangeRequestTokenForAccessToken)
+		{
+			ValidateVerifierMatchesStoredVerifier(context);
+		}
+	}
+
+	private void ValidateVerifierMatchesStoredVerifier(IOAuthContext context)
+	{
+		var actual = context.Verifier;
+
+		if (string.IsNullOrEmpty(actual))
+		{
+			throw Error.MissingRequiredOAuthParameter(context, Parameters.OAuth_Verifier);
 		}
 
-		public void InspectContext(ProviderPhase phase, IOAuthContext context)
+		var expected = _tokenStore.GetVerificationCodeForRequestToken(context);
+
+		if (expected != actual.Trim())
 		{
-			if (phase == ProviderPhase.GrantRequestToken)
-			{
-				ValidateCallbackUrlIsPartOfRequest(context);
-			}
-			else if (phase == ProviderPhase.ExchangeRequestTokenForAccessToken)
-			{
-				ValidateVerifierMatchesStoredVerifier(context);
-			}
+			throw Error.RejectedRequiredOAuthParameter(context, Parameters.OAuth_Verifier);
 		}
+	}
 
-		void ValidateVerifierMatchesStoredVerifier(IOAuthContext context)
+	private static void ValidateCallbackUrlIsPartOfRequest(IOAuthContext context)
+	{
+		if (string.IsNullOrEmpty(context.CallbackUrl))
 		{
-			string actual = context.Verifier;
-
-			if (string.IsNullOrEmpty(actual))
-			{
-				throw Error.MissingRequiredOAuthParameter(context, Parameters.OAuth_Verifier);
-			}
-
-			string expected = _tokenStore.GetVerificationCodeForRequestToken(context);
-
-			if (expected != actual.Trim())
-			{
-				throw Error.RejectedRequiredOAuthParameter(context, Parameters.OAuth_Verifier);
-			}
-		}
-
-		static void ValidateCallbackUrlIsPartOfRequest(IOAuthContext context)
-		{
-			if (string.IsNullOrEmpty(context.CallbackUrl))
-			{
-				throw Error.MissingRequiredOAuthParameter(context, Parameters.OAuth_Callback);
-			}
+			throw Error.MissingRequiredOAuthParameter(context, Parameters.OAuth_Callback);
 		}
 	}
 }

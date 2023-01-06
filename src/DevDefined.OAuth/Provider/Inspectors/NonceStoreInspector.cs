@@ -28,24 +28,22 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Storage;
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+public class NonceStoreInspector : IContextInspector
 {
-	public class NonceStoreInspector : IContextInspector
+	private readonly INonceStore _nonceStore;
+
+	public NonceStoreInspector(INonceStore nonceStore)
 	{
-		readonly INonceStore _nonceStore;
+		_nonceStore = nonceStore ?? throw new ArgumentNullException(nameof(nonceStore));
+	}
 
-		public NonceStoreInspector(INonceStore nonceStore)
+	public void InspectContext(ProviderPhase phase, IOAuthContext context)
+	{
+		if (!_nonceStore.RecordNonceAndCheckIsUnique(context, context.Nonce))
 		{
-			if (nonceStore == null) throw new ArgumentNullException("nonceStore");
-			_nonceStore = nonceStore;
-		}
-
-		public void InspectContext(ProviderPhase phase, IOAuthContext context)
-		{
-			if (!_nonceStore.RecordNonceAndCheckIsUnique(context, context.Nonce))
-			{
-				throw Error.NonceHasAlreadyBeenUsed(context);
-			}
+			throw Error.NonceHasAlreadyBeenUsed(context);
 		}
 	}
 }

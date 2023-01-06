@@ -25,20 +25,18 @@
 #endregion
 
 using System;
-using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth
+namespace DevDefined.OAuth.Framework;
+
+/// <summary>
+/// Generates unique nonces (via Guids) to let the server detect duplicated requests.
+/// </summary>
+public class GuidNonceGenerator : INonceGenerator
 {
-	/// <summary>
-	/// Generates unique nonces (via Guids) to let the server detect duplicated requests.
-	/// </summary>
-	public class GuidNonceGenerator : INonceGenerator
-	{
-		protected Random random = new Random();
+	protected Random random = new();
 
-		public string GenerateNonce(IOAuthContext context)
-		{
-			return Guid.NewGuid().ToString();
-		}
+	public string GenerateNonce(IOAuthContext context)
+	{
+		return Guid.NewGuid().ToString();
 	}
 }

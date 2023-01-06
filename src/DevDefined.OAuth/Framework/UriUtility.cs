@@ -32,296 +32,295 @@ using System.Text;
 using System.Web;
 using QueryParameter = System.Collections.Generic.KeyValuePair<string, string>;
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+public static class UriUtility
 {
-	public static class UriUtility
+	private const string OAuthAuthorizationHeaderStart = "OAuth";
+	private static readonly string[] HexEscapedUriRfc3986CharsToEscape;
+	private static readonly string[] QuoteCharacters = new[] {"\"", "'"};
+	private static readonly string[] UriRfc3986CharsToEscape = new[] {"!", "*", "'", "(", ")"};
+
+	static UriUtility()
 	{
-		const string OAuthAuthorizationHeaderStart = "OAuth";
-		static readonly string[] HexEscapedUriRfc3986CharsToEscape;
-		static readonly string[] QuoteCharacters = new[] {"\"", "'"};
-		static readonly string[] UriRfc3986CharsToEscape = new[] {"!", "*", "'", "(", ")"};
+		HexEscapedUriRfc3986CharsToEscape = UriRfc3986CharsToEscape.Select(c => Uri.HexEscape(c[0])).ToArray();
+	}
 
-		static UriUtility()
+	// see http://stackoverflow.com/questions/846487/how-to-get-uri-escapedatastring-to-comply-with-rfc-3986 for details
+	private static string EscapeUriDataStringRfc3986(string value)
+	{
+		// Fix for the exception Uri.EscapeDataString throws when the string is longer than 32766
+		// Microsoft documentation http://msdn.microsoft.com/en-us/library/system.uri.escapedatastring.aspx
+		var escaped = new StringBuilder();
+		const int maxChunkSize = 32766;
+		for (var i = 0; i <= value.Length; i += maxChunkSize)
 		{
-			HexEscapedUriRfc3986CharsToEscape = UriRfc3986CharsToEscape.Select(c => Uri.HexEscape(c[0])).ToArray();
+			var substring = value.Substring(i, Math.Min(value.Length - i, maxChunkSize));
+			escaped.Append(Uri.EscapeDataString(substring));
 		}
 
-		// see http://stackoverflow.com/questions/846487/how-to-get-uri-escapedatastring-to-comply-with-rfc-3986 for details
-		static string EscapeUriDataStringRfc3986(string value)
+		for (var i = 0; i < UriRfc3986CharsToEscape.Length; i++)
 		{
-			// Fix for the exception Uri.EscapeDataString throws when the string is longer than 32766
-			// Microsoft documentation http://msdn.microsoft.com/en-us/library/system.uri.escapedatastring.aspx
-			var escaped = new StringBuilder();
-			const int maxChunkSize = 32766;
-			for (int i = 0; i <= value.Length; i += maxChunkSize)
-			{
-				string substring = value.Substring(i, Math.Min(value.Length - i, maxChunkSize));
-				escaped.Append(Uri.EscapeDataString(substring));
-			}
-
-			for (int i = 0; i < UriRfc3986CharsToEscape.Length; i++)
-			{
-				escaped.Replace(UriRfc3986CharsToEscape[i], HexEscapedUriRfc3986CharsToEscape[i]);
-			}
-
-			return escaped.ToString();
+			escaped.Replace(UriRfc3986CharsToEscape[i], HexEscapedUriRfc3986CharsToEscape[i]);
 		}
 
-		/// <summary>
-		/// Extracts all the parameters from the supplied encoded parameters. 
-		/// </summary>
-		/// <param name="parameters"></param>
-		/// <returns></returns>
-		public static List<QueryParameter> GetQueryParameters(string parameters)
+		return escaped.ToString();
+	}
+
+	/// <summary>
+	/// Extracts all the parameters from the supplied encoded parameters. 
+	/// </summary>
+	/// <param name="parameters"></param>
+	/// <returns></returns>
+	public static List<QueryParameter> GetQueryParameters(string parameters)
+	{
+		if (parameters.StartsWith("?"))
 		{
-			if (parameters.StartsWith("?"))
-			{
-				parameters = parameters.Remove(0, 1);
-			}
+			parameters = parameters.Remove(0, 1);
+		}
 
-			var result = new List<QueryParameter>();
+		var result = new List<QueryParameter>();
 
-			if (!string.IsNullOrEmpty(parameters))
+		if (!string.IsNullOrEmpty(parameters))
+		{
+			var p = parameters.Split('&');
+			foreach (var s in p)
 			{
-				string[] p = parameters.Split('&');
-				foreach (string s in p)
+				if (!string.IsNullOrEmpty(s) && !s.StartsWith(Parameters.OAuthParameterPrefix) && !s.StartsWith(Parameters.XAuthParameterPrefix))
 				{
-					if (!string.IsNullOrEmpty(s) && !s.StartsWith(Parameters.OAuthParameterPrefix) && !s.StartsWith(Parameters.XAuthParameterPrefix))
+					if (s.IndexOf('=') > -1)
 					{
-						if (s.IndexOf('=') > -1)
-						{
-							string[] temp = s.Split('=');
-							result.Add(new QueryParameter(temp[0], temp[1]));
-						}
-						else
-						{
-							result.Add(new QueryParameter(s, string.Empty));
-						}
+						var temp = s.Split('=');
+						result.Add(new QueryParameter(temp[0], temp[1]));
+					}
+					else
+					{
+						result.Add(new QueryParameter(s, string.Empty));
 					}
 				}
 			}
+		}
 
+		return result;
+	}
+
+	/// <summary>
+	/// Extracts all the parameters from the supplied encoded parameters. 
+	/// </summary>
+	/// <param name="parameters"></param>
+	/// <returns></returns>
+	public static List<QueryParameter> GetHeaderParameters(string parameters)
+	{
+		parameters = parameters.Trim();
+
+		var result = new List<QueryParameter>();
+
+		if (!parameters.StartsWith(OAuthAuthorizationHeaderStart, StringComparison.InvariantCultureIgnoreCase))
+		{
 			return result;
 		}
 
-		/// <summary>
-		/// Extracts all the parameters from the supplied encoded parameters. 
-		/// </summary>
-		/// <param name="parameters"></param>
-		/// <returns></returns>
-		public static List<QueryParameter> GetHeaderParameters(string parameters)
+		parameters = parameters.Substring(OAuthAuthorizationHeaderStart.Length).Trim();
+
+		if (!string.IsNullOrEmpty(parameters))
 		{
-			parameters = parameters.Trim();
+			var p = parameters.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 
-			var result = new List<QueryParameter>();
-
-			if (!parameters.StartsWith(OAuthAuthorizationHeaderStart, StringComparison.InvariantCultureIgnoreCase))
+			foreach (var s in p)
 			{
-				return result;
+				if (string.IsNullOrEmpty(s)) continue;
+				var parameter = ParseAuthorizationHeaderKeyValuePair(s);					
+				result.Add(parameter);
 			}
+		}
 
-			parameters = parameters.Substring(OAuthAuthorizationHeaderStart.Length).Trim();
+		return result;
+	}
 
-			if (!string.IsNullOrEmpty(parameters))
+	public static QueryParameter ParseAuthorizationHeaderKeyValuePair(string keyEqualValuePair)
+	{
+		var indexOfEqualSign = keyEqualValuePair.IndexOf('=');
+
+		if (indexOfEqualSign > 0)
+		{
+			var key = keyEqualValuePair.Substring(0, indexOfEqualSign).Trim();
+
+			var quotedValue = keyEqualValuePair.Substring(indexOfEqualSign + 1);
+
+			var itemValue = StripQuotes(quotedValue);
+
+			itemValue = HttpUtility.UrlDecode(itemValue);
+
+			return new QueryParameter(key, itemValue);
+		}
+
+		return new QueryParameter(keyEqualValuePair.Trim(), string.Empty);
+	}
+
+	private static string StripQuotes(string quotedValue)
+	{
+		foreach (var quoteCharacter in QuoteCharacters)
+		{
+			if (quotedValue.StartsWith(quoteCharacter) && quotedValue.EndsWith(quoteCharacter) && quotedValue.Length > 1)
 			{
-				string[] p = parameters.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-
-				foreach (string s in p)
-				{
-					if (string.IsNullOrEmpty(s)) continue;
-					QueryParameter parameter = ParseAuthorizationHeaderKeyValuePair(s);					
-					result.Add(parameter);
-				}
+				return quotedValue.Substring(1, quotedValue.Length - 2);
 			}
-
-			return result;
 		}
 
-		public static QueryParameter ParseAuthorizationHeaderKeyValuePair(string keyEqualValuePair)
+		return quotedValue;
+	}
+
+	public static string UrlEncode(string value)
+	{
+		return EscapeUriDataStringRfc3986(value);
+	}
+
+	/// <summary>
+	/// Formats a set of query parameters, as per query string encoding.
+	/// </summary>
+	/// <param name="parameters"></param>
+	/// <returns></returns>
+	public static string FormatQueryString(IEnumerable<KeyValuePair<string, string>> parameters)
+	{
+		var builder = new StringBuilder();
+
+		if (parameters != null)
 		{
-			int indexOfEqualSign = keyEqualValuePair.IndexOf('=');
-
-			if (indexOfEqualSign > 0)
-			{
-				string key = keyEqualValuePair.Substring(0, indexOfEqualSign).Trim();
-
-				string quotedValue = keyEqualValuePair.Substring(indexOfEqualSign + 1);
-
-				string itemValue = StripQuotes(quotedValue);
-
-				itemValue = HttpUtility.UrlDecode(itemValue);
-
-				return new QueryParameter(key, itemValue);
-			}
-
-			return new QueryParameter(keyEqualValuePair.Trim(), string.Empty);
-		}
-
-		static string StripQuotes(string quotedValue)
-		{
-			foreach (string quoteCharacter in QuoteCharacters)
-			{
-				if (quotedValue.StartsWith(quoteCharacter) && quotedValue.EndsWith(quoteCharacter) && quotedValue.Length > 1)
-				{
-					return quotedValue.Substring(1, quotedValue.Length - 2);
-				}
-			}
-
-			return quotedValue;
-		}
-
-		public static string UrlEncode(string value)
-		{
-			return EscapeUriDataStringRfc3986(value);
-		}
-
-		/// <summary>
-		/// Formats a set of query parameters, as per query string encoding.
-		/// </summary>
-		/// <param name="parameters"></param>
-		/// <returns></returns>
-		public static string FormatQueryString(IEnumerable<KeyValuePair<string, string>> parameters)
-		{
-			var builder = new StringBuilder();
-
-			if (parameters != null)
-			{
-				foreach (var pair in parameters)
-				{
-					if (builder.Length > 0) builder.Append("&");
-					builder.Append(pair.Key).Append("=");
-					builder.Append(UrlEncode(pair.Value));
-				}
-			}
-
-			return builder.ToString();
-		}
-
-		/// <summary>
-		/// Formats a set of query parameters, as per query string encoding.
-		/// </summary>
-		/// <param name="parameters"></param>
-		/// <returns></returns>
-		public static string FormatQueryString(NameValueCollection parameters)
-		{
-			var builder = new StringBuilder();
-
-			if (parameters != null)
-			{
-				foreach (string key in parameters.Keys)
-				{
-					if (builder.Length > 0) builder.Append("&");
-					builder.Append(key).Append("=");
-					builder.Append(UrlEncode(parameters[key]));
-				}
-			}
-
-			return builder.ToString();
-		}
-
-		/// <summary>
-		/// Takes an http method, url and a set of parameters and formats them as a signature base as per the OAuth core spec.
-		/// </summary>
-		/// <param name="httpMethod"></param>
-		/// <param name="url"></param>
-		/// <param name="parameters"></param>
-		/// <returns></returns>
-		public static string FormatParameters(string httpMethod, Uri url, List<QueryParameter> parameters)
-		{
-			string normalizedRequestParameters = NormalizeRequestParameters(parameters);
-
-			var signatureBase = new StringBuilder();
-			signatureBase.AppendFormat("{0}&", httpMethod.ToUpper());
-
-			signatureBase.AppendFormat("{0}&", UrlEncode(NormalizeUri(url)));
-			signatureBase.AppendFormat("{0}", UrlEncode(normalizedRequestParameters));
-
-			return signatureBase.ToString();
-		}
-
-		/// <summary>
-		/// Normalizes a sequence of key/value pair parameters as per the OAuth core specification.
-		/// </summary>
-		/// <param name="parameters"></param>
-		/// <returns></returns>
-		public static string NormalizeRequestParameters(IEnumerable<QueryParameter> parameters)
-		{
-			IEnumerable<QueryParameter> orderedParameters = parameters
-				.OrderBy(x => x.Key, StringComparer.Ordinal)
-				.ThenBy(x => x.Value)
-				.Select(
-					x => new QueryParameter(x.Key, UrlEncode(x.Value)));
-
-			var builder = new StringBuilder();
-
-			foreach (var parameter in orderedParameters)
+			foreach (var pair in parameters)
 			{
 				if (builder.Length > 0) builder.Append("&");
-
-				builder.Append(parameter.Key).Append("=").Append(parameter.Value);
+				builder.Append(pair.Key).Append("=");
+				builder.Append(UrlEncode(pair.Value));
 			}
-
-			return builder.ToString();
 		}
 
-		/// <summary>
-		/// Normalizes a Url according to the OAuth specification (this ensures http or https on a default port is not displayed
-		/// with the :XXX following the host in the url).
-		/// </summary>
-		/// <param name="uri"></param>
-		/// <returns></returns>
-		public static string NormalizeUri(Uri uri)
-		{
-			string normalizedUrl = string.Format("{0}://{1}", uri.Scheme, uri.Host);
+		return builder.ToString();
+	}
 
-			if (!((uri.Scheme == "http" && uri.Port == 80) ||
-			      (uri.Scheme == "https" && uri.Port == 443)))
+	/// <summary>
+	/// Formats a set of query parameters, as per query string encoding.
+	/// </summary>
+	/// <param name="parameters"></param>
+	/// <returns></returns>
+	public static string FormatQueryString(NameValueCollection parameters)
+	{
+		var builder = new StringBuilder();
+
+		if (parameters != null)
+		{
+			foreach (string key in parameters.Keys)
 			{
-				normalizedUrl += ":" + uri.Port;
+				if (builder.Length > 0) builder.Append("&");
+				builder.Append(key).Append("=");
+				builder.Append(UrlEncode(parameters[key]));
 			}
-
-			return normalizedUrl + ((uri.AbsolutePath == "/") ? "" : uri.AbsolutePath);
 		}
 
-		public static IEnumerable<QueryParameter> ToQueryParameters(this NameValueCollection source)
+		return builder.ToString();
+	}
+
+	/// <summary>
+	/// Takes an http method, url and a set of parameters and formats them as a signature base as per the OAuth core spec.
+	/// </summary>
+	/// <param name="httpMethod"></param>
+	/// <param name="url"></param>
+	/// <param name="parameters"></param>
+	/// <returns></returns>
+	public static string FormatParameters(string httpMethod, Uri url, List<QueryParameter> parameters)
+	{
+		var normalizedRequestParameters = NormalizeRequestParameters(parameters);
+
+		var signatureBase = new StringBuilder();
+		signatureBase.AppendFormat("{0}&", httpMethod.ToUpper());
+
+		signatureBase.AppendFormat("{0}&", UrlEncode(NormalizeUri(url)));
+		signatureBase.AppendFormat("{0}", UrlEncode(normalizedRequestParameters));
+
+		return signatureBase.ToString();
+	}
+
+	/// <summary>
+	/// Normalizes a sequence of key/value pair parameters as per the OAuth core specification.
+	/// </summary>
+	/// <param name="parameters"></param>
+	/// <returns></returns>
+	public static string NormalizeRequestParameters(IEnumerable<QueryParameter> parameters)
+	{
+		var orderedParameters = parameters
+			.OrderBy(x => x.Key, StringComparer.Ordinal)
+			.ThenBy(x => x.Value)
+			.Select(
+				x => new QueryParameter(x.Key, UrlEncode(x.Value)));
+
+		var builder = new StringBuilder();
+
+		foreach (var parameter in orderedParameters)
 		{
-			foreach (string key in source.AllKeys)
+			if (builder.Length > 0) builder.Append("&");
+
+			builder.Append(parameter.Key).Append("=").Append(parameter.Value);
+		}
+
+		return builder.ToString();
+	}
+
+	/// <summary>
+	/// Normalizes a Url according to the OAuth specification (this ensures http or https on a default port is not displayed
+	/// with the :XXX following the host in the url).
+	/// </summary>
+	/// <param name="uri"></param>
+	/// <returns></returns>
+	public static string NormalizeUri(Uri uri)
+	{
+		var normalizedUrl = $"{uri.Scheme}://{uri.Host}";
+
+		if (!((uri.Scheme == "http" && uri.Port == 80) ||
+		      (uri.Scheme == "https" && uri.Port == 443)))
+		{
+			normalizedUrl += ":" + uri.Port;
+		}
+
+		return normalizedUrl + ((uri.AbsolutePath == "/") ? "" : uri.AbsolutePath);
+	}
+
+	public static IEnumerable<QueryParameter> ToQueryParameters(this NameValueCollection source)
+	{
+		foreach (var key in source.AllKeys)
+		{
+			yield return new QueryParameter(key, source[key]);
+		}
+	}
+
+	public static IEnumerable<QueryParameter> ToQueryParametersExcludingTokenSecret(this NameValueCollection source)
+	{
+		foreach (var key in source.AllKeys)
+		{
+			if (key != Parameters.OAuth_Token_Secret)
 			{
 				yield return new QueryParameter(key, source[key]);
 			}
 		}
+	}
 
-		public static IEnumerable<QueryParameter> ToQueryParametersExcludingTokenSecret(this NameValueCollection source)
+	public static NameValueCollection ToNameValueCollection(this IEnumerable<QueryParameter> source)
+	{
+		var collection = new NameValueCollection();
+
+		foreach (var parameter in source)
 		{
-			foreach (string key in source.AllKeys)
-			{
-				if (key != Parameters.OAuth_Token_Secret)
-				{
-					yield return new QueryParameter(key, source[key]);
-				}
-			}
+			collection[parameter.Key] = parameter.Value;
 		}
 
-		public static NameValueCollection ToNameValueCollection(this IEnumerable<QueryParameter> source)
-		{
-			var collection = new NameValueCollection();
+		return collection;
+	}
 
-			foreach (var parameter in source)
-			{
-				collection[parameter.Key] = parameter.Value;
-			}
+	public static string FormatTokenForResponse(IToken token)
+	{
+		var builder = new StringBuilder();
 
-			return collection;
-		}
+		builder.Append(Parameters.OAuth_Token).Append("=").Append(UrlEncode(token.Token))
+			.Append("&").Append(Parameters.OAuth_Token_Secret).Append("=").Append(UrlEncode(token.TokenSecret));
 
-		public static string FormatTokenForResponse(IToken token)
-		{
-			var builder = new StringBuilder();
-
-			builder.Append(Parameters.OAuth_Token).Append("=").Append(UrlEncode(token.Token))
-				.Append("&").Append(Parameters.OAuth_Token_Secret).Append("=").Append(UrlEncode(token.TokenSecret));
-
-			return builder.ToString();
-		}
+		return builder.ToString();
 	}
 }

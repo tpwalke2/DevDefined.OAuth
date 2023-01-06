@@ -28,50 +28,45 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Utility;
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+public class TimestampRangeInspector : IContextInspector
 {
-	public class TimestampRangeInspector : IContextInspector
+	private readonly Func<DateTime> _nowFunc;
+	private TimeSpan _maxAfterNow;
+	private TimeSpan _maxBeforeNow;
+
+	public TimestampRangeInspector(TimeSpan window)
+		: this(new TimeSpan(window.Ticks/2), new TimeSpan(window.Ticks/2))
 	{
-		readonly Func<DateTime> _nowFunc;
-		TimeSpan _maxAfterNow;
-		TimeSpan _maxBeforeNow;
+	}
 
-		public TimestampRangeInspector(TimeSpan window)
-			: this(new TimeSpan(window.Ticks/2), new TimeSpan(window.Ticks/2))
+	public TimestampRangeInspector(TimeSpan maxBeforeNow, TimeSpan maxAfterNow)
+		: this(maxBeforeNow, maxAfterNow, () => Clock.Now)
+	{
+	}
+
+	public TimestampRangeInspector(TimeSpan maxBeforeNow, TimeSpan maxAfterNow, Func<DateTime> nowFunc)
+	{
+		_maxBeforeNow = maxBeforeNow;
+		_maxAfterNow = maxAfterNow;
+		_nowFunc = nowFunc;
+	}
+
+	public void InspectContext(ProviderPhase phase, IOAuthContext context)
+	{
+		var timestamp = DateTimeUtility.FromEpoch(Convert.ToInt32(context.Timestamp));
+		var now = _nowFunc();
+
+		if (now.Subtract(_maxBeforeNow) > timestamp)
 		{
+			throw new OAuthException(context, OAuthProblems.TimestampRefused,
+				$"The timestamp is to old, it must be at most {_maxBeforeNow.TotalSeconds} seconds before the servers current date and time");
 		}
-
-		public TimestampRangeInspector(TimeSpan maxBeforeNow, TimeSpan maxAfterNow)
-			: this(maxBeforeNow, maxAfterNow, () => Clock.Now)
+		if (now.Add(_maxAfterNow) < timestamp)
 		{
-		}
-
-		public TimestampRangeInspector(TimeSpan maxBeforeNow, TimeSpan maxAfterNow, Func<DateTime> nowFunc)
-		{
-			_maxBeforeNow = maxBeforeNow;
-			_maxAfterNow = maxAfterNow;
-			_nowFunc = nowFunc;
-		}
-
-		public void InspectContext(ProviderPhase phase, IOAuthContext context)
-		{
-			DateTime timestamp = DateTimeUtility.FromEpoch(Convert.ToInt32(context.Timestamp));
-			DateTime now = _nowFunc();
-
-			if (now.Subtract(_maxBeforeNow) > timestamp)
-			{
-				throw new OAuthException(context, OAuthProblems.TimestampRefused,
-				                         string.Format(
-				                         	"The timestamp is to old, it must be at most {0} seconds before the servers current date and time",
-				                         	_maxBeforeNow.TotalSeconds));
-			}
-			if (now.Add(_maxAfterNow) < timestamp)
-			{
-				throw new OAuthException(context, OAuthProblems.TimestampRefused,
-				                         string.Format(
-				                         	"The timestamp is to far in the future, if must be at most {0} seconds after the server current date and time",
-				                         	_maxAfterNow.TotalSeconds));
-			}
+			throw new OAuthException(context, OAuthProblems.TimestampRefused,
+				$"The timestamp is to far in the future, if must be at most {_maxAfterNow.TotalSeconds} seconds after the server current date and time");
 		}
 	}
 }

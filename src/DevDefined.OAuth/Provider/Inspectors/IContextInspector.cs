@@ -26,10 +26,9 @@
 
 using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+public interface IContextInspector
 {
-	public interface IContextInspector
-	{
-		void InspectContext(ProviderPhase phase, IOAuthContext context);
-	}
+	void InspectContext(ProviderPhase phase, IOAuthContext context);
 }

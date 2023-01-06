@@ -27,18 +27,17 @@
 using System;
 using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth.Consumer
+namespace DevDefined.OAuth.Consumer;
+
+public class DefaultConsumerRequestFactory : IConsumerRequestFactory
 {
-	public class DefaultConsumerRequestFactory : IConsumerRequestFactory
+	public static readonly DefaultConsumerRequestFactory Instance = new();
+
+	public IConsumerRequest CreateConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
 	{
-		public static readonly DefaultConsumerRequestFactory Instance = new DefaultConsumerRequestFactory();
+		if (context == null) throw new ArgumentNullException(nameof(context));
+		if (consumerContext == null) throw new ArgumentNullException(nameof(consumerContext));
 
-		public IConsumerRequest CreateConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
-		{
-			if (context == null) throw new ArgumentNullException("context");
-			if (consumerContext == null) throw new ArgumentNullException("consumerContext");
-
-			return new ConsumerRequest(context, consumerContext, token);
-		}
+		return new ConsumerRequest(context, consumerContext, token);
 	}
 }
