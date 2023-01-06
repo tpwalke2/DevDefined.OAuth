@@ -36,10 +36,10 @@ namespace DevDefined.OAuth.Consumer;
 [Serializable]
 public class OAuthSession : IOAuthSession
 {
-	private readonly NameValueCollection _cookies = new NameValueCollection();
-	private readonly NameValueCollection _formParameters = new NameValueCollection();
-	private readonly NameValueCollection _headers = new NameValueCollection();
-	private readonly NameValueCollection _queryParameters = new NameValueCollection();
+	private readonly NameValueCollection _cookies = new();
+	private readonly NameValueCollection _formParameters = new();
+	private readonly NameValueCollection _headers = new();
+	private readonly NameValueCollection _queryParameters = new();
 	private IConsumerRequestFactory _consumerRequestFactory = DefaultConsumerRequestFactory.Instance;
 
 	public OAuthSession(IOAuthConsumerContext consumerContext)

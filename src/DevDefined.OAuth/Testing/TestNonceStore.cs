@@ -35,7 +35,7 @@ namespace DevDefined.OAuth.Testing;
 /// </summary>
 public class TestNonceStore : INonceStore
 {
-	private readonly Dictionary<string, List<string>> _nonces = new Dictionary<string, List<string>>();
+	private readonly Dictionary<string, List<string>> _nonces = new();
 
 	public bool RecordNonceAndCheckIsUnique(IConsumer consumer, string nonce)
 	{

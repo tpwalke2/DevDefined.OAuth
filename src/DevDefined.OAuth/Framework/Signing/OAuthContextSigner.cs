@@ -31,8 +31,7 @@ namespace DevDefined.OAuth.Framework.Signing;
 
 public class OAuthContextSigner : IOAuthContextSigner
 {
-	private readonly List<IContextSignatureImplementation> _implementations =
-		new List<IContextSignatureImplementation>();
+	private readonly List<IContextSignatureImplementation> _implementations = new();
 
 	public OAuthContextSigner(params IContextSignatureImplementation[] implementations)
 	{

@@ -34,7 +34,7 @@ namespace DevDefined.OAuth.Provider;
 
 public class OAuthProvider : IOAuthProvider
 {
-    private readonly List<IContextInspector> _inspectors = new List<IContextInspector>();
+    private readonly List<IContextInspector> _inspectors = new();
     private readonly ITokenStore _tokenStore;
 
     public OAuthProvider(ITokenStore tokenStore, params IContextInspector[] inspectors)

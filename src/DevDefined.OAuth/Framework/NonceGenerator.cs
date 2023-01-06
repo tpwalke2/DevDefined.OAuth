@@ -34,7 +34,7 @@ namespace DevDefined.OAuth;
 /// </summary>
 public class GuidNonceGenerator : INonceGenerator
 {
-	protected Random random = new Random();
+	protected Random random = new();
 
 	public string GenerateNonce(IOAuthContext context)
 	{

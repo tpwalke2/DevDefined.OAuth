@@ -31,7 +31,7 @@ namespace DevDefined.OAuth.Consumer;
 
 public class DefaultConsumerRequestFactory : IConsumerRequestFactory
 {
-	public static readonly DefaultConsumerRequestFactory Instance = new DefaultConsumerRequestFactory();
+	public static readonly DefaultConsumerRequestFactory Instance = new();
 
 	public IConsumerRequest CreateConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
 	{

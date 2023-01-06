@@ -33,7 +33,7 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors;
 public class BodyHashValidationInspectorTests
 {
 	private const string EmptyBodyHash = "2jmj7l5rSw0yVb/vlWAYkK/YBwk=";
-	private readonly BodyHashValidationInspector inspector = new BodyHashValidationInspector();
+	private readonly BodyHashValidationInspector inspector = new();
 
 	[Fact]
 	public void inspect_body_for_plainttext_signature_does_nothing()

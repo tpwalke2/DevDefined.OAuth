@@ -36,7 +36,7 @@ namespace DevDefined.OAuth.Storage.Basic;
 public class InMemoryTokenRepository<T> : ITokenRepository<T>
 	where T : TokenBase
 {
-	private readonly Dictionary<string, T> _tokens = new Dictionary<string, T>();
+	private readonly Dictionary<string, T> _tokens = new();
 
 	public T GetToken(string token)
 	{

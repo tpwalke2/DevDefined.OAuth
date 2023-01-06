@@ -24,7 +24,7 @@ namespace DevDefined.OAuth.Utility;
 /// </summary>
 public class ReflectionBasedDictionaryAdapter : IDictionary
 {
-	private readonly Dictionary<string, object> _properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+	private readonly Dictionary<string, object> _properties = new(StringComparer.OrdinalIgnoreCase);
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ReflectionBasedDictionaryAdapter"/> class.
