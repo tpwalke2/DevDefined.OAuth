@@ -63,29 +63,24 @@ public static class Error
         return new Exception($"Unknown signature method \"{signatureMethod}\"");
     }
 
-    public static Exception ForRsaSha1SignatureMethodYouMustSupplyAssymetricKeyParameter()
+    public static Exception ForRsaSha1SignatureMethodYouMustSupplyAsymmetricKeyParameter()
     {
         return
             new Exception(
-                "For the RSASSA-PKCS1-v1_5 signature method you must use the constructor which takes an additional AssymetricAlgorithm \"key\" parameter");
+                "For the RSASSA-PKCS1-v1_5 signature method you must use the constructor which takes an additional AsymmetricAlgorithm \"key\" parameter");
     }
 
     public static Exception RequestFailed(WebException innerException)
     {
-        var response = innerException.Response as HttpWebResponse;
+        if (innerException.Response is not HttpWebResponse response) return innerException;
+        using var reader = new StreamReader(innerException.Response.GetResponseStream());
 
-        if (response != null)
-        {
-            using var reader = new StreamReader(innerException.Response.GetResponseStream());
+        var body = reader.ReadToEnd();
 
-            var body = reader.ReadToEnd();
+        return
+            new Exception(
+                $"Request for uri: {response.ResponseUri} failed.\r\nstatus code: {response.StatusCode}\r\nheaders: {response.Headers}\r\nbody:\r\n{body}", innerException);
 
-            return
-                new Exception(
-                    $"Request for uri: {response.ResponseUri} failed.\r\nstatus code: {response.StatusCode}\r\nheaders: {response.Headers}\r\nbody:\r\n{body}", innerException);
-        }
-
-        return innerException;
     }
 
     public static Exception EmptyConsumerKey()
@@ -118,7 +113,7 @@ public static class Error
     {
         return
             new Exception(
-                "Algorithm Property must be set on SingingContext when using an Assymetric encryption method such as RSA-SHA1");
+                "Algorithm Property must be set on SigningContext when using an Asymmetric encryption method such as RSA-SHA1");
     }
 
     public static Exception SuppliedTokenWasNotIssuedToThisConsumer(string expectedConsumerKey,

@@ -97,6 +97,6 @@ public class OAuthConsumerContext : IOAuthConsumerContext
 		if (string.IsNullOrEmpty(ConsumerKey)) throw Error.EmptyConsumerKey();
 		if (string.IsNullOrEmpty(SignatureMethod)) throw Error.UnknownSignatureMethod(SignatureMethod);
 		if ((SignatureMethod == Framework.SignatureMethod.RsaSha1)
-		    && (Key == null)) throw Error.ForRsaSha1SignatureMethodYouMustSupplyAssymetricKeyParameter();
+		    && (Key == null)) throw Error.ForRsaSha1SignatureMethodYouMustSupplyAsymmetricKeyParameter();
 	}
 }

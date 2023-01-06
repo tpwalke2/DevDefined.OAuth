@@ -549,16 +549,13 @@ internal class AsnParser
 #pragma warning restore 0219
 
 			var length = GetLength();
-			if (length > RemainingBytes())
-			{
-				var sb = new StringBuilder("Incorrect Size. ");
-				sb.AppendFormat("Specified: {0}, Remaining: {1}",
-					length.ToString(CultureInfo.InvariantCulture),
-					RemainingBytes().ToString(CultureInfo.InvariantCulture));
-				throw new BerDecodeException(sb.ToString(), position);
-			}
-
-			return GetOctets(length);
+			if (length <= RemainingBytes()) return GetOctets(length);
+			
+			var sb = new StringBuilder("Incorrect Size. ");
+			sb.AppendFormat("Specified: {0}, Remaining: {1}",
+				length.ToString(CultureInfo.InvariantCulture),
+				RemainingBytes().ToString(CultureInfo.InvariantCulture));
+			throw new BerDecodeException(sb.ToString(), position);
 		}
 
 		catch (ArgumentOutOfRangeException ex)
