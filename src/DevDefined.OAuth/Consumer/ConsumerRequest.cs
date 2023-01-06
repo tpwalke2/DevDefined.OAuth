@@ -84,7 +84,7 @@ public class ConsumerRequest : IConsumerRequest
 			Method = Context.RequestMethod,
 		};
 
-		if ((Context.FormEncodedParameters != null) && (Context.FormEncodedParameters.Count > 0))
+		if (Context.FormEncodedParameters is { Count: > 0 })
 		{
 			description.ContentType = Parameters.HttpFormEncoded;
 			description.Body = UriUtility.FormatQueryString(Context.FormEncodedParameters.ToQueryParametersExcludingTokenSecret());
@@ -122,9 +122,7 @@ public class ConsumerRequest : IConsumerRequest
 		}
 		catch (WebException webEx)
 		{
-			OAuthException authException;
-
-			if (WebExceptionHelper.TryWrapException(Context, webEx, out authException, ResponseBodyAction))
+			if (WebExceptionHelper.TryWrapException(Context, webEx, out var authException, ResponseBodyAction))
 			{
 				throw authException;
 			}
@@ -139,10 +137,7 @@ public class ConsumerRequest : IConsumerRequest
 		{
 			var encodedFormParameters = ToString();
 
-			if (ResponseBodyAction != null)
-			{
-				ResponseBodyAction(encodedFormParameters);
-			}
+			ResponseBodyAction?.Invoke(encodedFormParameters);
 
 			try
 			{
@@ -242,7 +237,7 @@ public class ConsumerRequest : IConsumerRequest
 
 			writer.Write(description.Body);
 		}
-		else if (description.RawBody != null && description.RawBody.Length > 0)
+		else if (description.RawBody is { Length: > 0 })
 		{
 			request.ContentType = description.ContentType;
 

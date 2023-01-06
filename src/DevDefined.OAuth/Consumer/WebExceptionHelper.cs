@@ -40,6 +40,7 @@ public static class WebExceptionHelper
 	/// <param name="requestContext"></param>
 	/// <param name="webEx"></param>
 	/// <param name="authException"></param>
+	/// <param name="responseBodyAction"></param>
 	/// <returns><c>true</c>, if the authException should be throw, <c>false</c> if the original web exception should be thrown</returns>
 	public static bool TryWrapException(IOAuthContext requestContext, WebException webEx, out OAuthException authException, Action<string> responseBodyAction)
 	{
@@ -47,10 +48,7 @@ public static class WebExceptionHelper
 		{
 			var content = webEx.Response.ReadToEnd();
 
-			if (responseBodyAction != null)
-			{
-				responseBodyAction(content);
-			}
+			responseBodyAction?.Invoke(content);
 
 			if (content.Contains(Parameters.OAuth_Problem))
 			{
@@ -59,8 +57,9 @@ public static class WebExceptionHelper
 				return true;
 			}
 		}
-		catch
+		catch (Exception)
 		{
+			throw;
 		}
 		authException = new OAuthException();
 		return false;
