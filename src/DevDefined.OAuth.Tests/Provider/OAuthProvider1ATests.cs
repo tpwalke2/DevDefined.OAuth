@@ -30,6 +30,7 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Provider;
 using DevDefined.OAuth.Provider.Inspectors;
 using DevDefined.OAuth.Testing;
+using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
 namespace DevDefined.OAuth.Tests.Provider
@@ -59,7 +60,7 @@ namespace DevDefined.OAuth.Tests.Provider
 			                      		SignatureMethod = signatureMethod,
 			                      		ConsumerKey = "key",
 			                      		ConsumerSecret = "secret",
-			                      		Key = TestCertificates.OAuthTestCertificate().PrivateKey
+			                      		Key = TestCertificates.OAuthTestCertificate().GetRSAPrivateKey()
 			                      	};
 
 			var session = new OAuthSession(consumerContext, "http://localhost/oauth/requesttoken.rails",

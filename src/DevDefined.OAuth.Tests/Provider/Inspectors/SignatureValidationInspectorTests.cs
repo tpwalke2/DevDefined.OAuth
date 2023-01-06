@@ -84,7 +84,7 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.RsaSha1 };
 
 			consumerStore.Setup(store => store.GetConsumerPublicKey(context))
-				.Returns(TestCertificates.OAuthTestCertificate().PublicKey.Key);
+				.Returns(TestCertificates.OAuthTestCertificate().PublicKey.GetRSAPublicKey);
 			signer.Setup(contextSigner =>
 				contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>())).Returns(true);
 
