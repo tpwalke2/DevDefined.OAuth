@@ -36,7 +36,7 @@ namespace DevDefined.OAuth.Framework
         public static Exception MissingRequiredOAuthParameter(IOAuthContext context, string parameterName)
         {
             var exception = new OAuthException(context, OAuthProblems.ParameterAbsent,
-                                               string.Format("Missing required parameter : {0}", parameterName));
+                $"Missing required parameter : {parameterName}");
 
             exception.Report.ParametersAbsent.Add(parameterName);
 
@@ -45,22 +45,22 @@ namespace DevDefined.OAuth.Framework
 
         public static Exception OAuthAuthenticationFailure(string errorMessage)
         {
-            return new Exception(string.Format("OAuth authentication failed, message was: {0}", errorMessage));
+            return new Exception($"OAuth authentication failed, message was: {errorMessage}");
         }
 
         public static Exception TokenCanNoLongerBeUsed(string token)
         {
-            return new Exception(string.Format("Token \"{0}\" is no longer valid", token));
+            return new Exception($"Token \"{token}\" is no longer valid");
         }
 
         public static Exception FailedToParseResponse(string parameters)
         {
-            return new Exception(string.Format("Failed to parse response string \"{0}\"", parameters));
+            return new Exception($"Failed to parse response string \"{parameters}\"");
         }
 
         public static Exception UnknownSignatureMethod(string signatureMethod)
         {
-            return new Exception(string.Format("Unknown signature method \"{0}\"", signatureMethod));
+            return new Exception($"Unknown signature method \"{signatureMethod}\"");
         }
 
         public static Exception ForRsaSha1SignatureMethodYouMustSupplyAssymetricKeyParameter()
@@ -82,9 +82,7 @@ namespace DevDefined.OAuth.Framework
 
                     return
                         new Exception(
-                            string.Format(
-                                "Request for uri: {0} failed.\r\nstatus code: {1}\r\nheaders: {2}\r\nbody:\r\n{3}",
-                                response.ResponseUri, response.StatusCode, response.Headers, body), innerException);
+                            $"Request for uri: {response.ResponseUri} failed.\r\nstatus code: {response.StatusCode}\r\nheaders: {response.Headers}\r\nbody:\r\n{body}", innerException);
                 }
             }
 
@@ -98,7 +96,7 @@ namespace DevDefined.OAuth.Framework
 
         public static Exception RequestMethodHasNotBeenAssigned(string parameter)
         {
-            return new Exception(string.Format("The RequestMethod parameter \"{0}\" is null or empty.", parameter));
+            return new Exception($"The RequestMethod parameter \"{parameter}\" is null or empty.");
         }
 
         public static Exception FailedToValidateSignature(IOAuthContext context)
@@ -114,8 +112,7 @@ namespace DevDefined.OAuth.Framework
         public static Exception UnknownConsumerKey(IOAuthContext context)
         {
             return new OAuthException(context, OAuthProblems.ConsumerKeyUnknown,
-                                      string.Format("Unknown Consumer (Realm: {0}, Key: {1})", context.Realm,
-                                                    context.ConsumerKey));
+                $"Unknown Consumer (Realm: {context.Realm}, Key: {context.ConsumerKey})");
         }
 
         public static Exception AlgorithmPropertyNotSetOnSigningContext()
@@ -130,8 +127,7 @@ namespace DevDefined.OAuth.Framework
         {
             return
                 new Exception(
-                    string.Format("Supplied token was not issued to this consumer, expected key: {0}, actual key: {1}",
-                                  expectedConsumerKey, actualConsumerKey));
+                    $"Supplied token was not issued to this consumer, expected key: {expectedConsumerKey}, actual key: {actualConsumerKey}");
         }
 
         public static Exception AccessDeniedToProtectedResource(AccessOutcome outcome)
@@ -140,12 +136,11 @@ namespace DevDefined.OAuth.Framework
 
             if (string.IsNullOrEmpty(outcome.AdditionalInfo))
             {
-                return new AccessDeniedException(outcome, string.Format("Access to resource \"{0}\" was denied", uri));
+                return new AccessDeniedException(outcome, $"Access to resource \"{uri}\" was denied");
             }
 
             return new AccessDeniedException(outcome,
-                                             string.Format("Access to resource: {0} was denied, additional info: {1}",
-                                                           uri, outcome.AdditionalInfo));
+                $"Access to resource: {uri} was denied, additional info: {outcome.AdditionalInfo}");
         }
 
         public static Exception ConsumerHasNotBeenGrantedAccessYet(IOAuthContext context)
@@ -168,7 +163,7 @@ namespace DevDefined.OAuth.Framework
         public static Exception NonceHasAlreadyBeenUsed(IOAuthContext context)
         {
             return new OAuthException(context, OAuthProblems.NonceUsed,
-                                      string.Format("The nonce value \"{0}\" has already been used", context.Nonce));
+                $"The nonce value \"{context.Nonce}\" has already been used");
         }
 
         public static Exception ThisConsumerRequestHasAlreadyBeenSigned()
@@ -183,17 +178,17 @@ namespace DevDefined.OAuth.Framework
 
         public static Exception RejectedRequiredOAuthParameter(IOAuthContext context, string parameter)
         {
-            return new OAuthException(context, OAuthProblems.ParameterRejected, string.Format("The parameter \"{0}\" was rejected", parameter));
+            return new OAuthException(context, OAuthProblems.ParameterRejected, $"The parameter \"{parameter}\" was rejected");
         }
 
         public static Exception UnknownToken(IOAuthContext context, string token)
         {
-            return new OAuthException(context, OAuthProblems.TokenRejected, string.Format("Unknown or previously rejected token \"{0}\"", token));
+            return new OAuthException(context, OAuthProblems.TokenRejected, $"Unknown or previously rejected token \"{token}\"");
         }
 
         public static Exception UnknownToken(IOAuthContext context, string token, Exception exception)
         {
-            return new OAuthException(context, OAuthProblems.TokenRejected, string.Format("Unknown or previously rejected token \"{0}\"", token), exception);
+            return new OAuthException(context, OAuthProblems.TokenRejected, $"Unknown or previously rejected token \"{token}\"", exception);
         }
 
         public static Exception RequestForTokenMustNotIncludeTokenInContext(IOAuthContext context)

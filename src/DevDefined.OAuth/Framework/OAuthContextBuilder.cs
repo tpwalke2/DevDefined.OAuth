@@ -59,7 +59,7 @@ namespace DevDefined.OAuth.Framework
 
 			if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
 			{
-				throw new ArgumentException(string.Format("Failed to parse url: {0} into a valid Uri instance", url));
+				throw new ArgumentException($"Failed to parse url: {url} into a valid Uri instance");
 			}
 
 			return FromUri(httpMethod, uri);

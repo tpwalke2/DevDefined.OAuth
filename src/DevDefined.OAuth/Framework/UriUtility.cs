@@ -272,7 +272,7 @@ namespace DevDefined.OAuth.Framework
 		/// <returns></returns>
 		public static string NormalizeUri(Uri uri)
 		{
-			var normalizedUrl = string.Format("{0}://{1}", uri.Scheme, uri.Host);
+			var normalizedUrl = $"{uri.Scheme}://{uri.Host}";
 
 			if (!((uri.Scheme == "http" && uri.Port == 80) ||
 			      (uri.Scheme == "https" && uri.Port == 443)))

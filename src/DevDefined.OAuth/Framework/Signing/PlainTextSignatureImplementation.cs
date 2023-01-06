@@ -47,7 +47,7 @@ namespace DevDefined.OAuth.Framework.Signing
 
 		string GenerateSignature(IOAuthContext authContext, SigningContext signingContext)
 		{
-			return UriUtility.UrlEncode(string.Format("{0}&{1}", signingContext.ConsumerSecret, authContext.TokenSecret));
+			return UriUtility.UrlEncode($"{signingContext.ConsumerSecret}&{authContext.TokenSecret}");
 		}
 	}
 }

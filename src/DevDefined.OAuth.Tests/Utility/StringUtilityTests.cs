@@ -56,7 +56,8 @@ namespace DevDefined.OAuth.Tests.Utility
 
 			var percentDifferenceStringEquals = CalculatePercentageDifference(stringEqualsRangesOfTime);
 
-			Assert.True(percentDifference < 0.50m, string.Format("Difference in time when calculating is never greater then 50%, but was: {0:0.00%}", percentDifference));
+			Assert.True(percentDifference < 0.50m,
+				$"Difference in time when calculating is never greater then 50%, but was: {percentDifference:0.00%}");
 
 			// if you break here and check values, you should see that percentDifferenceStringEquals is dramatically wider i.e. maximum time to compare may be 100 times greater
 			// then minimum time to compare.

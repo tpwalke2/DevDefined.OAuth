@@ -56,7 +56,7 @@ namespace DevDefined.OAuth.Framework.Signing
 			var tokenSecret = (authContext.TokenSecret != null)
 			                     	? UriUtility.UrlEncode(authContext.TokenSecret)
 			                     	: null;
-			var hashSource = string.Format("{0}&{1}", consumerSecret, tokenSecret);
+			var hashSource = $"{consumerSecret}&{tokenSecret}";
 
 			var hashAlgorithm = new HMACSHA1 {Key = Encoding.ASCII.GetBytes(hashSource)};
 
