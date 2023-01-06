@@ -36,11 +36,11 @@ namespace DevDefined.OAuth.Consumer;
 [Serializable]
 public class OAuthSession : IOAuthSession
 {
-	readonly NameValueCollection _cookies = new NameValueCollection();
-	readonly NameValueCollection _formParameters = new NameValueCollection();
-	readonly NameValueCollection _headers = new NameValueCollection();
-	readonly NameValueCollection _queryParameters = new NameValueCollection();
-	IConsumerRequestFactory _consumerRequestFactory = DefaultConsumerRequestFactory.Instance;
+	private readonly NameValueCollection _cookies = new NameValueCollection();
+	private readonly NameValueCollection _formParameters = new NameValueCollection();
+	private readonly NameValueCollection _headers = new NameValueCollection();
+	private readonly NameValueCollection _queryParameters = new NameValueCollection();
+	private IConsumerRequestFactory _consumerRequestFactory = DefaultConsumerRequestFactory.Instance;
 
 	public OAuthSession(IOAuthConsumerContext consumerContext)
 		: this(consumerContext, (Uri)null, null, null, null)
@@ -353,31 +353,31 @@ public class OAuthSession : IOAuthSession
 		};
 	}
 
-	static bool WasCallbackConfimed(NameValueCollection parameters)
+	private static bool WasCallbackConfimed(NameValueCollection parameters)
 	{
 		var value = ParseResponseParameter(parameters, Parameters.OAuth_Callback_Confirmed);
 		return (value == "true");
 	}
 
-	static Uri ParseCallbackUri(string callBackUrl)
+	private static Uri ParseCallbackUri(string callBackUrl)
 	{
 		if (string.IsNullOrEmpty(callBackUrl)) return null;
 		if (callBackUrl.Equals("oob", StringComparison.InvariantCultureIgnoreCase)) return null;
 		return new Uri(callBackUrl);
 	}
 
-	static string ParseResponseParameter(NameValueCollection collection, string parameter)
+	private static string ParseResponseParameter(NameValueCollection collection, string parameter)
 	{
 		var value = (collection[parameter] ?? "").Trim();
 		return (value.Length > 0) ? value : null;
 	}
 
-	OAuthSession AddItems(NameValueCollection destination, object anonymousClass)
+	private OAuthSession AddItems(NameValueCollection destination, object anonymousClass)
 	{
 		return AddItems(destination, new ReflectionBasedDictionaryAdapter(anonymousClass));
 	}
 
-	OAuthSession AddItems(NameValueCollection destination, IDictionary additions)
+	private OAuthSession AddItems(NameValueCollection destination, IDictionary additions)
 	{
 		foreach (string parameter in additions.Keys)
 		{

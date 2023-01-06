@@ -48,7 +48,7 @@ public class HmacSha1SignatureImplementation : IContextSignatureImplementation
 		return authContext.Signature.EqualsInConstantTime(GenerateSignature(authContext, signingContext));
 	}
 
-	static string GenerateSignature(IToken authContext, SigningContext signingContext)
+	private static string GenerateSignature(IToken authContext, SigningContext signingContext)
 	{
 		var consumerSecret = (signingContext.ConsumerSecret != null)
 			? UriUtility.UrlEncode(signingContext.ConsumerSecret)
@@ -63,7 +63,7 @@ public class HmacSha1SignatureImplementation : IContextSignatureImplementation
 		return ComputeHash(hashAlgorithm, signingContext.SignatureBase);
 	}
 
-	static string ComputeHash(HashAlgorithm hashAlgorithm, string data)
+	private static string ComputeHash(HashAlgorithm hashAlgorithm, string data)
 	{
 		if (hashAlgorithm == null)
 		{

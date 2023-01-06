@@ -137,7 +137,7 @@ public class BigInteger
 	// maximum length of the BigInteger in uint (4 bytes)
 	// change this to suit the required level of precision.
 
-	const int maxLength = 1024;
+	private const int maxLength = 1024;
 
 	// primes smaller than 2000 to test the generated prime number
 
@@ -183,7 +183,7 @@ public class BigInteger
 	                                               	1997, 1999
 	                                               };
 
-	readonly uint[] data; // stores bytes from the Big Integer
+	private readonly uint[] data; // stores bytes from the Big Integer
 	public int dataLength; // number of actual chars used
 
 	//***********************************************************************
@@ -772,7 +772,7 @@ public class BigInteger
 
 	// least significant bits at lower part of buffer
 
-	static int shiftLeft(uint[] buffer, int shiftVal)
+	private static int shiftLeft(uint[] buffer, int shiftVal)
 	{
 		var shiftAmount = 32;
 		var bufLen = buffer.Length;
@@ -839,7 +839,7 @@ public class BigInteger
 		return result;
 	}
 
-	static int shiftRight(uint[] buffer, int shiftVal)
+	private static int shiftRight(uint[] buffer, int shiftVal)
 	{
 		var shiftAmount = 32;
 		var invShift = 0;
@@ -1046,7 +1046,7 @@ public class BigInteger
 	// Algorithm taken from [1]
 	//***********************************************************************
 
-	static void multiByteDivide(BigInteger bi1, BigInteger bi2,
+	private static void multiByteDivide(BigInteger bi1, BigInteger bi2,
 	                            BigInteger outQuotient, BigInteger outRemainder)
 	{
 		var result = new uint[maxLength];
@@ -1176,7 +1176,7 @@ public class BigInteger
 	// a divisor that has only 1 digit.
 	//***********************************************************************
 
-	static void singleByteDivide(BigInteger bi1, BigInteger bi2,
+	private static void singleByteDivide(BigInteger bi1, BigInteger bi2,
 	                             BigInteger outQuotient, BigInteger outRemainder)
 	{
 		var result = new uint[maxLength];
@@ -1596,7 +1596,7 @@ public class BigInteger
 	// Reference [4]
 	//***********************************************************************
 
-	BigInteger BarrettReduction(BigInteger x, BigInteger n, BigInteger constant)
+	private BigInteger BarrettReduction(BigInteger x, BigInteger n, BigInteger constant)
 	{
 		int k = n.dataLength,
 		    kPlusOne = k + 1,
@@ -2112,7 +2112,7 @@ public class BigInteger
 		return LucasStrongTestHelper(thisVal);
 	}
 
-	bool LucasStrongTestHelper(BigInteger thisVal)
+	private bool LucasStrongTestHelper(BigInteger thisVal)
 	{
 		// Do the test (selects D based on Selfridge)
 		// Let D be the first element of the sequence
@@ -2816,7 +2816,7 @@ Console.WriteLine("Not prime!  Divisible by {0}\n",
 	// k must be odd.  i.e LSB == 1
 	//***********************************************************************
 
-	static BigInteger[] LucasSequenceHelper(BigInteger P, BigInteger Q,
+	private static BigInteger[] LucasSequenceHelper(BigInteger P, BigInteger Q,
 	                                        BigInteger k, BigInteger n,
 	                                        BigInteger constant, int s)
 	{

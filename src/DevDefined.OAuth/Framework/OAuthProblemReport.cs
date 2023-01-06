@@ -124,7 +124,7 @@ public class OAuthProblemReport
 		return UriUtility.FormatQueryString(response);
 	}
 
-	static string FormatParameterNames(IEnumerable<string> names)
+	private static string FormatParameterNames(IEnumerable<string> names)
 	{
 		var builder = new StringBuilder();
 
@@ -137,7 +137,7 @@ public class OAuthProblemReport
 		return builder.ToString();
 	}
 
-	static List<string> ParseFormattedParameters(string formattedList)
+	private static List<string> ParseFormattedParameters(string formattedList)
 	{
 		return formattedList.Split(new[] {'&'}, StringSplitOptions.RemoveEmptyEntries).ToList();
 	}

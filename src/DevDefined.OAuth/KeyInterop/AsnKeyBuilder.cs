@@ -27,7 +27,7 @@ using System.Security.Cryptography;
 
 namespace MonoRailsOAuth.Core.KeyInterop;
 
-class AsnKeyBuilder
+internal class AsnKeyBuilder
 {
     public class AsnMessage
     {

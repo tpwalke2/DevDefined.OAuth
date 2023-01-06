@@ -32,7 +32,7 @@ namespace DevDefined.OAuth.Provider.Inspectors;
 
 public class ConsumerValidationInspector : IContextInspector
 {
-	readonly IConsumerStore _consumerStore;
+	private readonly IConsumerStore _consumerStore;
 
 	public ConsumerValidationInspector(IConsumerStore consumerStore)
 	{

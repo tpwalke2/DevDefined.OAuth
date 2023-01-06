@@ -34,8 +34,8 @@ namespace DevDefined.OAuth.Provider;
 
 public class OAuthProvider : IOAuthProvider
 {
-    readonly List<IContextInspector> _inspectors = new List<IContextInspector>();
-    readonly ITokenStore _tokenStore;
+    private readonly List<IContextInspector> _inspectors = new List<IContextInspector>();
+    private readonly ITokenStore _tokenStore;
 
     public OAuthProvider(ITokenStore tokenStore, params IContextInspector[] inspectors)
     {
@@ -97,7 +97,7 @@ public class OAuthProvider : IOAuthProvider
         return _tokenStore.CreateAccessToken(context);
     }
 
-    void AssertContextDoesNotIncludeToken(IOAuthContext context)
+    private void AssertContextDoesNotIncludeToken(IOAuthContext context)
     {
         if (context.Token != null)
         {
@@ -119,7 +119,7 @@ public class OAuthProvider : IOAuthProvider
         ApplyInspectors(context, phase);
     }
 
-    void ApplyInspectors(IOAuthContext context, ProviderPhase phase)
+    private void ApplyInspectors(IOAuthContext context, ProviderPhase phase)
     {
         foreach (var inspector in _inspectors)
         {
@@ -127,7 +127,7 @@ public class OAuthProvider : IOAuthProvider
         }
     }
 
-    void AddStoredTokenSecretToContext(IOAuthContext context, ProviderPhase phase)
+    private void AddStoredTokenSecretToContext(IOAuthContext context, ProviderPhase phase)
     {
         if (phase == ProviderPhase.ExchangeRequestTokenForAccessToken)
         {
@@ -143,7 +143,7 @@ public class OAuthProvider : IOAuthProvider
         }
     }
 
-    static void AssertContextDoesNotIncludeTokenSecret(IOAuthContext context)
+    private static void AssertContextDoesNotIncludeTokenSecret(IOAuthContext context)
     {
         if (!string.IsNullOrEmpty(context.TokenSecret))
         {

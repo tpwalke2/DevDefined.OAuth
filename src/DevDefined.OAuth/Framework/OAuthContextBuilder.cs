@@ -38,8 +38,8 @@ namespace DevDefined.OAuth.Framework;
 
 public class OAuthContextBuilder : IOAuthContextBuilder
 {
-	readonly Func<Uri, Uri> _uriAdjuster;
-	readonly Func<Uri, Uri> _emptyUriAdjuster = (uri) => uri;
+	private readonly Func<Uri, Uri> _uriAdjuster;
+	private readonly Func<Uri, Uri> _emptyUriAdjuster = (uri) => uri;
 
 	public OAuthContextBuilder(Func<Uri, Uri> uriAdjuster)
 	{
@@ -159,7 +159,7 @@ public class OAuthContextBuilder : IOAuthContextBuilder
 		return RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(adjustedUri);
 	}
 
-	static Uri RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(Uri adjustedUri)
+	private static Uri RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(Uri adjustedUri)
 	{
 		// this is a fix for OpenSocial platforms sometimes appending an empty query string parameter
 		// to their url.

@@ -34,7 +34,7 @@ namespace DevDefined.OAuth.KeyInterop;
 [Serializable]
 public sealed class BerDecodeException : Exception
 {
-	readonly int m_position;
+	private readonly int m_position;
 
 	public BerDecodeException()
 	{
@@ -62,7 +62,7 @@ public sealed class BerDecodeException : Exception
 		m_position = position;
 	}
 
-	BerDecodeException(SerializationInfo info, StreamingContext context)
+	private BerDecodeException(SerializationInfo info, StreamingContext context)
 		: base(info, context)
 	{
 		m_position = info.GetInt32("Position");

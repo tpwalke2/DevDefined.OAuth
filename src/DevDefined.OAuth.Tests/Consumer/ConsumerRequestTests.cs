@@ -34,9 +34,9 @@ namespace DevDefined.OAuth.Tests.Consumer;
 
 public class ConsumerRequestTests
 {
-	readonly AccessToken accessToken;
-	readonly OAuthConsumerContext consumerContext;
-	readonly OAuthContext context;
+	private readonly AccessToken accessToken;
+	private readonly OAuthConsumerContext consumerContext;
+	private readonly OAuthContext context;
 
 	public ConsumerRequestTests()
 	{

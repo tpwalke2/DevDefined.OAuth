@@ -34,8 +34,8 @@ namespace DevDefined.OAuth.Consumer;
 
 public class LocalFileCertificateFactory : ICertificateFactory
 {
-	readonly string _filename;
-	readonly string _password;
+	private readonly string _filename;
+	private readonly string _password;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="LocalFileCertificateFactory"/> class.

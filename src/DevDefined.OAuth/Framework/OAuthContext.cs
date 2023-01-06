@@ -38,28 +38,28 @@ namespace DevDefined.OAuth.Framework;
 [Serializable]
 public class OAuthContext : IOAuthContext
 {
-	readonly BoundParameter _bodyHash;
-	readonly BoundParameter _callbackUrl;
-	readonly BoundParameter _consumerKey;
-	readonly BoundParameter _nonce;
-	readonly BoundParameter _sessionHandle;
-	readonly BoundParameter _signature;
-	readonly BoundParameter _signatureMethod;
-	readonly BoundParameter _timestamp;
-	readonly BoundParameter _token;
-	readonly BoundParameter _tokenSecret;
-	readonly BoundParameter _verifier;
-	readonly BoundParameter _version;
-	readonly BoundParameter _xAuthMode;
-	readonly BoundParameter _xAuthUsername;
-	readonly BoundParameter _xAuthPassword;
-	NameValueCollection _authorizationHeaderParameters;
-	NameValueCollection _cookies;
-	NameValueCollection _formEncodedParameters;
-	NameValueCollection _headers;
-	string _normalizedRequestUrl;
-	NameValueCollection _queryParameters;
-	Uri _rawUri;
+	private readonly BoundParameter _bodyHash;
+	private readonly BoundParameter _callbackUrl;
+	private readonly BoundParameter _consumerKey;
+	private readonly BoundParameter _nonce;
+	private readonly BoundParameter _sessionHandle;
+	private readonly BoundParameter _signature;
+	private readonly BoundParameter _signatureMethod;
+	private readonly BoundParameter _timestamp;
+	private readonly BoundParameter _token;
+	private readonly BoundParameter _tokenSecret;
+	private readonly BoundParameter _verifier;
+	private readonly BoundParameter _version;
+	private readonly BoundParameter _xAuthMode;
+	private readonly BoundParameter _xAuthUsername;
+	private readonly BoundParameter _xAuthPassword;
+	private NameValueCollection _authorizationHeaderParameters;
+	private NameValueCollection _cookies;
+	private NameValueCollection _formEncodedParameters;
+	private NameValueCollection _headers;
+	private string _normalizedRequestUrl;
+	private NameValueCollection _queryParameters;
+	private Uri _rawUri;
 
 	public OAuthContext()
 	{

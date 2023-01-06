@@ -32,9 +32,9 @@ namespace DevDefined.OAuth.Provider.Inspectors;
 
 public class TimestampRangeInspector : IContextInspector
 {
-	readonly Func<DateTime> _nowFunc;
-	TimeSpan _maxAfterNow;
-	TimeSpan _maxBeforeNow;
+	private readonly Func<DateTime> _nowFunc;
+	private TimeSpan _maxAfterNow;
+	private TimeSpan _maxBeforeNow;
 
 	public TimestampRangeInspector(TimeSpan window)
 		: this(new TimeSpan(window.Ticks/2), new TimeSpan(window.Ticks/2))

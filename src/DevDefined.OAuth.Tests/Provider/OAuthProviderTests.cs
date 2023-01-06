@@ -37,7 +37,7 @@ namespace DevDefined.OAuth.Tests.Provider;
 
 public class OAuthProvider10Tests
 {
-	readonly OAuthProvider provider;
+	private readonly OAuthProvider provider;
 
 	public OAuthProvider10Tests()
 	{
@@ -53,7 +53,7 @@ public class OAuthProvider10Tests
 			new XAuthValidationInspector(ValidateXAuthMode, AuthenticateXAuthUsernameAndPassword));
 	}
 
-	static IOAuthSession CreateConsumer(string signatureMethod)
+	private static IOAuthSession CreateConsumer(string signatureMethod)
 	{
 		var consumerContext = new OAuthConsumerContext
 		{

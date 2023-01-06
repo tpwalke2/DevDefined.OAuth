@@ -36,8 +36,8 @@ namespace DevDefined.OAuth.Consumer;
 /// </summary>
 public class LocalMachineCertificateFactory : ICertificateFactory
 {
-	readonly string _certificateSubject;
-	readonly X509FindType _findType;
+	private readonly string _certificateSubject;
+	private readonly X509FindType _findType;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="LocalMachineCertificateFactory"/> class.
@@ -88,7 +88,7 @@ public class LocalMachineCertificateFactory : ICertificateFactory
 	/// Gets the certificate collection.
 	/// </summary>
 	/// <returns></returns>
-	X509Certificate2Collection GetCertificateCollection()
+	private X509Certificate2Collection GetCertificateCollection()
 	{
 		var certStore = new X509Store("My", StoreLocation.LocalMachine);
 		certStore.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);

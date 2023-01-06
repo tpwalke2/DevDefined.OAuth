@@ -90,7 +90,7 @@ public class StringUtilityTests
 		Assert.Equal(expected, value.EqualsInConstantTime(other));
 	}
 
-	static string GenerateTestString(double percentMatch, int length)
+	private static string GenerateTestString(double percentMatch, int length)
 	{
 		var matchLength = (int) (percentMatch*length);
 		var nonMatchLength = length - matchLength;
@@ -100,7 +100,7 @@ public class StringUtilityTests
 		return new string('X', matchLength) + new string('Y', nonMatchLength);
 	}
 
-	static decimal CalculatePercentageDifference(long[] rangesOfTime)
+	private static decimal CalculatePercentageDifference(long[] rangesOfTime)
 	{
 		var maxTime = rangesOfTime.Max();
 

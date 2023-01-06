@@ -37,9 +37,9 @@ namespace DevDefined.OAuth.Consumer;
 
 public class ConsumerRequest : IConsumerRequest
 {
-	readonly IOAuthConsumerContext _consumerContext;
-	readonly IOAuthContext _context;
-	readonly IToken _token;
+	private readonly IOAuthConsumerContext _consumerContext;
+	private readonly IOAuthContext _context;
+	private readonly IToken _token;
 
 	public ConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
 	{
@@ -48,7 +48,7 @@ public class ConsumerRequest : IConsumerRequest
 		_token = token;
 	}
 
-	string ResponseBody { get; set; }
+	private string ResponseBody { get; set; }
 
 	public IOAuthConsumerContext ConsumerContext
 	{
@@ -274,7 +274,7 @@ public class ConsumerRequest : IConsumerRequest
 		return ResponseBody;
 	}
 
-	void EnsureRequestHasNotBeenSignedYet()
+	private void EnsureRequestHasNotBeenSignedYet()
 	{
 		if (!string.IsNullOrEmpty(_context.Signature))
 		{

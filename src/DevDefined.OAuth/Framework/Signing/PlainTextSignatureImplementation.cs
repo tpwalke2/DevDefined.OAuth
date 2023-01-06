@@ -45,7 +45,7 @@ public class PlainTextSignatureImplementation : IContextSignatureImplementation
 		return authContext.Signature.EqualsInConstantTime(GenerateSignature(authContext, signingContext));
 	}
 
-	string GenerateSignature(IOAuthContext authContext, SigningContext signingContext)
+	private string GenerateSignature(IOAuthContext authContext, SigningContext signingContext)
 	{
 		return UriUtility.UrlEncode($"{signingContext.ConsumerSecret}&{authContext.TokenSecret}");
 	}

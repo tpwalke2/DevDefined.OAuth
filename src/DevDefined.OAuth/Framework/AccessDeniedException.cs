@@ -31,7 +31,7 @@ namespace DevDefined.OAuth.Framework;
 
 public class AccessDeniedException : Exception
 {
-	readonly AccessOutcome _outcome;
+	private readonly AccessOutcome _outcome;
 
 	public AccessDeniedException(AccessOutcome outcome)
 		: this(outcome, null)

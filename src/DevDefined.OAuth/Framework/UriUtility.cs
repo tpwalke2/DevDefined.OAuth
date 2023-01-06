@@ -36,10 +36,10 @@ namespace DevDefined.OAuth.Framework;
 
 public static class UriUtility
 {
-	const string OAuthAuthorizationHeaderStart = "OAuth";
-	static readonly string[] HexEscapedUriRfc3986CharsToEscape;
-	static readonly string[] QuoteCharacters = new[] {"\"", "'"};
-	static readonly string[] UriRfc3986CharsToEscape = new[] {"!", "*", "'", "(", ")"};
+	private const string OAuthAuthorizationHeaderStart = "OAuth";
+	private static readonly string[] HexEscapedUriRfc3986CharsToEscape;
+	private static readonly string[] QuoteCharacters = new[] {"\"", "'"};
+	private static readonly string[] UriRfc3986CharsToEscape = new[] {"!", "*", "'", "(", ")"};
 
 	static UriUtility()
 	{
@@ -47,7 +47,7 @@ public static class UriUtility
 	}
 
 	// see http://stackoverflow.com/questions/846487/how-to-get-uri-escapedatastring-to-comply-with-rfc-3986 for details
-	static string EscapeUriDataStringRfc3986(string value)
+	private static string EscapeUriDataStringRfc3986(string value)
 	{
 		// Fix for the exception Uri.EscapeDataString throws when the string is longer than 32766
 		// Microsoft documentation http://msdn.microsoft.com/en-us/library/system.uri.escapedatastring.aspx
@@ -157,7 +157,7 @@ public static class UriUtility
 		return new QueryParameter(keyEqualValuePair.Trim(), string.Empty);
 	}
 
-	static string StripQuotes(string quotedValue)
+	private static string StripQuotes(string quotedValue)
 	{
 		foreach (var quoteCharacter in QuoteCharacters)
 		{

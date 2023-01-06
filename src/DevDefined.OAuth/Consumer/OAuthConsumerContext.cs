@@ -35,8 +35,8 @@ namespace DevDefined.OAuth.Consumer;
 [Serializable]
 public class OAuthConsumerContext : IOAuthConsumerContext
 {
-	INonceGenerator _nonceGenerator = new GuidNonceGenerator();
-	IOAuthContextSigner _signer = new OAuthContextSigner();
+	private INonceGenerator _nonceGenerator = new GuidNonceGenerator();
+	private IOAuthContextSigner _signer = new OAuthContextSigner();
 
 	public OAuthConsumerContext()
 	{
@@ -92,7 +92,7 @@ public class OAuthConsumerContext : IOAuthConsumerContext
 		SignContext(context);
 	}
 
-	void EnsureStateIsValid()
+	private void EnsureStateIsValid()
 	{
 		if (string.IsNullOrEmpty(ConsumerKey)) throw Error.EmptyConsumerKey();
 		if (string.IsNullOrEmpty(SignatureMethod)) throw Error.UnknownSignatureMethod(SignatureMethod);

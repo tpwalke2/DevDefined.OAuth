@@ -37,7 +37,7 @@ namespace DevDefined.OAuth.Tests.Provider;
 
 public class OAuthProvider1ATests
 {
-	readonly OAuthProvider provider;
+	private readonly OAuthProvider provider;
 
 	public OAuthProvider1ATests()
 	{
@@ -53,7 +53,7 @@ public class OAuthProvider1ATests
 			new OAuth10AInspector(tokenStore));
 	}
 
-	static IOAuthSession CreateConsumer(string signatureMethod)
+	private static IOAuthSession CreateConsumer(string signatureMethod)
 	{
 		var consumerContext = new OAuthConsumerContext
 		{

@@ -58,7 +58,7 @@ public class RsaSha1SignatureImplementation : IContextSignatureImplementation
 		return deformatter.VerifySignature(sha1, signature);
 	}
 
-	string GenerateSignature(IOAuthContext authContext, SigningContext signingContext)
+	private string GenerateSignature(IOAuthContext authContext, SigningContext signingContext)
 	{
 		if (signingContext.Algorithm == null)
 			throw Error.AlgorithmPropertyNotSetOnSigningContext();
@@ -73,7 +73,7 @@ public class RsaSha1SignatureImplementation : IContextSignatureImplementation
 		return Convert.ToBase64String(signature);
 	}
 
-	SHA1CryptoServiceProvider GenerateHash(SigningContext signingContext)
+	private SHA1CryptoServiceProvider GenerateHash(SigningContext signingContext)
 	{
 		var sha1 = new SHA1CryptoServiceProvider();
 

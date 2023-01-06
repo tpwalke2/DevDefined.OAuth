@@ -125,7 +125,7 @@ public class TestTokenStore : ITokenStore
 		return new TokenBase {ConsumerKey = "key", Realm = null, Token = "accesskey", TokenSecret = AccessSecret, SessionHandle = "sessionHandle"};
 	}
 
-	static void EnsureTestConsumer(IConsumer consumer)
+	private static void EnsureTestConsumer(IConsumer consumer)
 	{
 		if (consumer == null) throw new ArgumentNullException(nameof(consumer));
 		if (consumer.Realm != null)

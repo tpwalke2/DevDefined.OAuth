@@ -37,7 +37,7 @@ public static class StringUtility
 		return CompareStringsInConstantTime(value, other);
 	}
 
-	static bool CompareStringsInConstantTime(string value, string other)
+	private static bool CompareStringsInConstantTime(string value, string other)
 	{
 		var result = 0;
 

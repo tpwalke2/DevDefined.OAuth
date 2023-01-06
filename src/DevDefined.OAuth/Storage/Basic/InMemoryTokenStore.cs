@@ -32,8 +32,8 @@ namespace DevDefined.OAuth.Storage.Basic;
 
 public class SimpleTokenStore : ITokenStore
 {
-	readonly ITokenRepository<AccessToken> _accessTokenRepository;
-	readonly ITokenRepository<RequestToken> _requestTokenRepository;
+	private readonly ITokenRepository<AccessToken> _accessTokenRepository;
+	private readonly ITokenRepository<RequestToken> _requestTokenRepository;
 
 	public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
 	{
@@ -156,7 +156,7 @@ public class SimpleTokenStore : ITokenStore
 		throw new NotImplementedException();
 	}
 
-	RequestToken GetRequestToken(IOAuthContext context)
+	private RequestToken GetRequestToken(IOAuthContext context)
 	{
 		try
 		{
@@ -169,7 +169,7 @@ public class SimpleTokenStore : ITokenStore
 		}
 	}
 
-	AccessToken GetAccessToken(IOAuthContext context)
+	private AccessToken GetAccessToken(IOAuthContext context)
 	{
 		try
 		{
@@ -201,7 +201,7 @@ public class SimpleTokenStore : ITokenStore
 		return token;
 	}
 
-	static void UseUpRequestToken(IOAuthContext requestContext, RequestToken requestToken)
+	private static void UseUpRequestToken(IOAuthContext requestContext, RequestToken requestToken)
 	{
 		if (requestToken.UsedUp)
 		{

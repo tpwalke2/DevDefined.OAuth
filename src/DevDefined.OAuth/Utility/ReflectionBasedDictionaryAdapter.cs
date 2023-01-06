@@ -24,7 +24,7 @@ namespace DevDefined.OAuth.Utility;
 /// </summary>
 public class ReflectionBasedDictionaryAdapter : IDictionary
 {
-	readonly Dictionary<string, object> _properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+	private readonly Dictionary<string, object> _properties = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ReflectionBasedDictionaryAdapter"/> class.
@@ -222,10 +222,10 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 
 	#region Nested type: DictionaryEntryEnumeratorAdapter
 
-	class DictionaryEntryEnumeratorAdapter : IDictionaryEnumerator
+	private class DictionaryEntryEnumeratorAdapter : IDictionaryEnumerator
 	{
-		readonly IDictionaryEnumerator _enumerator;
-		KeyValuePair<string, object> _current;
+		private readonly IDictionaryEnumerator _enumerator;
+		private KeyValuePair<string, object> _current;
 
 		public DictionaryEntryEnumeratorAdapter(IDictionaryEnumerator enumerator)
 		{

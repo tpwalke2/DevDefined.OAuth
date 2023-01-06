@@ -30,7 +30,7 @@ namespace DevDefined.OAuth.Utility;
 
 public class DisposableAction : IDisposable
 {
-	readonly Action _action;
+	private readonly Action _action;
 
 	public DisposableAction(Action action)
 	{

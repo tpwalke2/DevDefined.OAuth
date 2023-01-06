@@ -32,8 +32,8 @@ namespace DevDefined.OAuth.Provider.Inspectors;
 
 public class SignatureValidationInspector : IContextInspector
 {
-	readonly IConsumerStore _consumerStore;
-	readonly IOAuthContextSigner _signer;
+	private readonly IConsumerStore _consumerStore;
+	private readonly IOAuthContextSigner _signer;
 
 	public SignatureValidationInspector(IConsumerStore consumerStore)
 		: this(consumerStore, new OAuthContextSigner())

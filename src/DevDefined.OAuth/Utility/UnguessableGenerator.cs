@@ -33,7 +33,7 @@ namespace DevDefined.OAuth.Utility;
 /// </summary>
 public class UnguessableGenerator
 {
-	const string AllowableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/^()";
+	private const string AllowableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/^()";
 
 	/// <summary>
 	/// Generates an unguessable string sequence of a certain length

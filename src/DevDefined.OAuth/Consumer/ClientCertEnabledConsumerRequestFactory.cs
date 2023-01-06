@@ -30,7 +30,7 @@ namespace DevDefined.OAuth.Consumer;
 
 public class ClientCertEnabledConsumerRequestFactory : IConsumerRequestFactory
 {
-	readonly ICertificateFactory _certificateFactory;
+	private readonly ICertificateFactory _certificateFactory;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ClientCertEnabledConsumerRequestFactory"/> class.

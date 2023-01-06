@@ -32,7 +32,7 @@ namespace DevDefined.OAuth.Provider.Inspectors;
 
 public class NonceStoreInspector : IContextInspector
 {
-	readonly INonceStore _nonceStore;
+	private readonly INonceStore _nonceStore;
 
 	public NonceStoreInspector(INonceStore nonceStore)
 	{

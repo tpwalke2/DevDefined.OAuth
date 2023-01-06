@@ -31,7 +31,7 @@ namespace DevDefined.OAuth.Framework.Signing;
 
 public class OAuthContextSigner : IOAuthContextSigner
 {
-	readonly List<IContextSignatureImplementation> _implementations =
+	private readonly List<IContextSignatureImplementation> _implementations =
 		new List<IContextSignatureImplementation>();
 
 	public OAuthContextSigner(params IContextSignatureImplementation[] implementations)
@@ -58,7 +58,7 @@ public class OAuthContextSigner : IOAuthContextSigner
 		return FindImplementationForAuthContext(authContext).ValidateSignature(authContext, signingContext);
 	}
 
-	IContextSignatureImplementation FindImplementationForAuthContext(IOAuthContext authContext)
+	private IContextSignatureImplementation FindImplementationForAuthContext(IOAuthContext authContext)
 	{
 		var impl =
 			_implementations.FirstOrDefault(i => i.MethodName == authContext.SignatureMethod);

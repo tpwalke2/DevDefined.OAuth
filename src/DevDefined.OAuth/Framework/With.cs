@@ -40,7 +40,7 @@ public static class With
 		return new DisposableAction(delegate { ServicePointManager.ServerCertificateValidationCallback = oldCallback; });
 	}
 
-	static bool CertificateAlwaysValidCallback(object sender, X509Certificate certificate, X509Chain chain,
+	private static bool CertificateAlwaysValidCallback(object sender, X509Certificate certificate, X509Chain chain,
 		SslPolicyErrors sslPolicyErrors)
 	{
 		return true;
@@ -49,7 +49,7 @@ public static class With
 
 public class DisposableAction : IDisposable
 {
-	readonly Action _action;
+	private readonly Action _action;
 
 	public DisposableAction(Action action)
 	{

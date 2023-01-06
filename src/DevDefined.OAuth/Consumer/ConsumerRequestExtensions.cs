@@ -55,12 +55,12 @@ public static class ConsumerRequestExtensions
 		return request.ForMethod("POST");
 	}
 
-	static void ApplyParameters(NameValueCollection destination, object anonymousClass)
+	private static void ApplyParameters(NameValueCollection destination, object anonymousClass)
 	{
 		ApplyParameters(destination, new ReflectionBasedDictionaryAdapter(anonymousClass));
 	}
 
-	static void ApplyParameters(NameValueCollection destination, IDictionary additions)
+	private static void ApplyParameters(NameValueCollection destination, IDictionary additions)
 	{
 		if (additions == null) throw new ArgumentNullException(nameof(additions));
 

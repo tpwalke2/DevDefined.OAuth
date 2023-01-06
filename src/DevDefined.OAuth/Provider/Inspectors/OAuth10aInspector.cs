@@ -35,7 +35,7 @@ namespace DevDefined.OAuth.Provider.Inspectors;
 /// </summary>
 public class OAuth10AInspector : IContextInspector
 {
-	readonly ITokenStore _tokenStore;
+	private readonly ITokenStore _tokenStore;
 
 	public OAuth10AInspector(ITokenStore tokenStore)
 	{
@@ -54,7 +54,7 @@ public class OAuth10AInspector : IContextInspector
 		}
 	}
 
-	void ValidateVerifierMatchesStoredVerifier(IOAuthContext context)
+	private void ValidateVerifierMatchesStoredVerifier(IOAuthContext context)
 	{
 		var actual = context.Verifier;
 
@@ -71,7 +71,7 @@ public class OAuth10AInspector : IContextInspector
 		}
 	}
 
-	static void ValidateCallbackUrlIsPartOfRequest(IOAuthContext context)
+	private static void ValidateCallbackUrlIsPartOfRequest(IOAuthContext context)
 	{
 		if (string.IsNullOrEmpty(context.CallbackUrl))
 		{

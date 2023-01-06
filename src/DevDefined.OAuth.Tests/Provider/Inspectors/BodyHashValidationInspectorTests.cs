@@ -32,8 +32,8 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors;
 
 public class BodyHashValidationInspectorTests
 {
-	const string EmptyBodyHash = "2jmj7l5rSw0yVb/vlWAYkK/YBwk=";
-	readonly BodyHashValidationInspector inspector = new BodyHashValidationInspector();
+	private const string EmptyBodyHash = "2jmj7l5rSw0yVb/vlWAYkK/YBwk=";
+	private readonly BodyHashValidationInspector inspector = new BodyHashValidationInspector();
 
 	[Fact]
 	public void inspect_body_for_plainttext_signature_does_nothing()

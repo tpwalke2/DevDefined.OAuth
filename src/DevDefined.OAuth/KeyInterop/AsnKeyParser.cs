@@ -36,7 +36,7 @@ namespace DevDefined.OAuth.KeyInterop;
 
 public class AsnKeyParser
 {
-	readonly AsnParser parser;
+	private readonly AsnParser parser;
 
 	public AsnKeyParser(String pathname)
 	{
@@ -479,8 +479,8 @@ public class AsnKeyParser
 
 internal class AsnParser
 {
-	readonly int initialCount;
-	readonly List<byte> octets;
+	private readonly int initialCount;
+	private readonly List<byte> octets;
 
 	public AsnParser(byte[] values)
 	{
@@ -500,7 +500,7 @@ internal class AsnParser
 		return octets.Count;
 	}
 
-	int GetLength()
+	private int GetLength()
 	{
 		var length = 0;
 

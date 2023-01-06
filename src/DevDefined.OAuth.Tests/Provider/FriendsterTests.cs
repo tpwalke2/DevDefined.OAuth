@@ -40,7 +40,7 @@ namespace DevDefined.OAuth.Tests.Provider;
 
 public class FriendsterTests
 {
-	const string _friendsterCertificate =
+	private const string _friendsterCertificate =
 		@"-----BEGIN CERTIFICATE-----
 MIIB2TCCAYOgAwIBAgIBADANBgkqhkiG9w0BAQUFADAvMQswCQYDVQQGEwJVUzEL
 MAkGA1UECBMCQ0ExEzARBgNVBAoTCkZyaWVuZHN0ZXIwHhcNMDgwODEzMTgwMzQ5

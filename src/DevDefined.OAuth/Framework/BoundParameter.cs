@@ -30,8 +30,8 @@ namespace DevDefined.OAuth.Framework;
 
 internal class BoundParameter
 {
-	readonly OAuthContext _context;
-	readonly string _name;
+	private readonly OAuthContext _context;
+	private readonly string _name;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="BoundParameter"/> class.
@@ -80,7 +80,7 @@ internal class BoundParameter
 	/// Gets the collection.
 	/// </summary>
 	/// <value>The collection.</value>
-	NameValueCollection Collection
+	private NameValueCollection Collection
 	{
 		get
 		{

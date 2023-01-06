@@ -31,7 +31,7 @@ namespace DevDefined.OAuth.Utility;
 
 public static class Clock
 {
-	static Func<DateTime> _nowFunc;
+	private static Func<DateTime> _nowFunc;
 
 	static Clock()
 	{
