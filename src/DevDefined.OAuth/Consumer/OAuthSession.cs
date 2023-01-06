@@ -115,7 +115,7 @@ namespace DevDefined.OAuth.Consumer
 			context.Headers.Add(_headers);
 			context.QueryParameters.Add(_queryParameters);
 
-			IConsumerRequest consumerRequest = _consumerRequestFactory.CreateConsumerRequest(context, ConsumerContext, accessToken);
+			var consumerRequest = _consumerRequestFactory.CreateConsumerRequest(context, ConsumerContext, accessToken);
 
 			consumerRequest.ProxyServerUri = ProxyServerUri;
 			consumerRequest.ResponseBodyAction = ResponseBodyAction;
@@ -136,7 +136,7 @@ namespace DevDefined.OAuth.Consumer
 			context.Headers.Add(_headers);
 			context.QueryParameters.Add(_queryParameters);
 
-			IConsumerRequest consumerRequest = _consumerRequestFactory.CreateConsumerRequest(context, ConsumerContext, AccessToken);
+			var consumerRequest = _consumerRequestFactory.CreateConsumerRequest(context, ConsumerContext, AccessToken);
 
 			consumerRequest.ProxyServerUri = ProxyServerUri;
 			consumerRequest.ResponseBodyAction = ResponseBodyAction;
@@ -161,7 +161,7 @@ namespace DevDefined.OAuth.Consumer
 
 		public IToken ExchangeRequestTokenForAccessToken(IToken requestToken, string method, string verificationCode)
 		{
-			TokenBase token = BuildExchangeRequestTokenForAccessTokenContext(requestToken, method, verificationCode)
+			var token = BuildExchangeRequestTokenForAccessTokenContext(requestToken, method, verificationCode)
 				.Select(collection =>
 				        new TokenBase
 				        	{
@@ -178,7 +178,7 @@ namespace DevDefined.OAuth.Consumer
 
 	  public IToken GetAccessTokenUsingXAuth(string authMode, string username, string password)
       {
-         TokenBase token = BuildAccessTokenContext("GET", authMode, username, password)
+         var token = BuildAccessTokenContext("GET", authMode, username, password)
                 .Select(collection =>
                         new TokenBase
                         {
@@ -305,7 +305,7 @@ namespace DevDefined.OAuth.Consumer
 
 		public IToken RenewAccessToken(IToken accessToken, string method, string sessionHandle)
 		{
-			TokenBase token = BuildRenewAccessTokenContext(accessToken, method, sessionHandle)
+			var token = BuildRenewAccessTokenContext(accessToken, method, sessionHandle)
 				.Select(collection =>
 				        new TokenBase
 				        	{
@@ -355,7 +355,7 @@ namespace DevDefined.OAuth.Consumer
 
 		static bool WasCallbackConfimed(NameValueCollection parameters)
 		{
-			string value = ParseResponseParameter(parameters, Parameters.OAuth_Callback_Confirmed);
+			var value = ParseResponseParameter(parameters, Parameters.OAuth_Callback_Confirmed);
 			return (value == "true");
 		}
 
@@ -368,7 +368,7 @@ namespace DevDefined.OAuth.Consumer
 
 		static string ParseResponseParameter(NameValueCollection collection, string parameter)
 		{
-			string value = (collection[parameter] ?? "").Trim();
+			var value = (collection[parameter] ?? "").Trim();
 			return (value.Length > 0) ? value : null;
 		}
 

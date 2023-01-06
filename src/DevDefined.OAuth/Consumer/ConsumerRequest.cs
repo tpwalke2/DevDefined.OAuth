@@ -86,7 +86,7 @@ namespace DevDefined.OAuth.Consumer
 				}
 			}
 
-			Uri uri = _context.GenerateUri();
+			var uri = _context.GenerateUri();
 
 			var description = new RequestDescription
 			                  	{
@@ -127,7 +127,7 @@ namespace DevDefined.OAuth.Consumer
 		{
 			try
 			{
-				HttpWebRequest request = ToWebRequest();
+				var request = ToWebRequest();
 				return (HttpWebResponse) request.GetResponse();
 			}
 			catch (WebException webEx)
@@ -147,7 +147,7 @@ namespace DevDefined.OAuth.Consumer
 		{
 			try
 			{
-				string encodedFormParameters = ToString();
+				var encodedFormParameters = ToString();
 
 				if (ResponseBodyAction != null)
 				{
@@ -204,7 +204,7 @@ namespace DevDefined.OAuth.Consumer
 
 		public virtual HttpWebRequest ToWebRequest()
 		{
-			RequestDescription description = GetRequestDescription();
+			var description = GetRequestDescription();
 
 			var request = (HttpWebRequest) WebRequest.Create(description.Url);
 			request.Method = description.Method;
@@ -222,7 +222,7 @@ namespace DevDefined.OAuth.Consumer
 			{
 				if (Context.Headers["If-Modified-Since"] != null)
 				{
-					string modifiedDateString = Context.Headers["If-Modified-Since"];
+					var modifiedDateString = Context.Headers["If-Modified-Since"];
 					request.IfModifiedSince = DateTime.Parse(modifiedDateString);
 				}
 			}
@@ -238,7 +238,7 @@ namespace DevDefined.OAuth.Consumer
 			
 			if (description.Headers.Count > 0)
 			{
-				foreach (string key in description.Headers.AllKeys)
+				foreach (var key in description.Headers.AllKeys)
 				{
 					request.Headers[key] = description.Headers[key];
 				}

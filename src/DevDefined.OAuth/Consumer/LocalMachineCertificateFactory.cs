@@ -58,7 +58,7 @@ namespace DevDefined.OAuth.Consumer
 		/// <returns></returns>
 		public X509Certificate2 CreateCertificate()
 		{
-			X509Certificate2Collection certificateCollection = GetCertificateCollection();
+			var certificateCollection = GetCertificateCollection();
 			return certificateCollection.Count > 0 ? certificateCollection[0] : null;
 		}
 
@@ -92,7 +92,7 @@ namespace DevDefined.OAuth.Consumer
 		{
 			var certStore = new X509Store("My", StoreLocation.LocalMachine);
 			certStore.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
-			X509Certificate2Collection certificateCollection = certStore.Certificates.Find(_findType, _certificateSubject, false);
+			var certificateCollection = certStore.Certificates.Find(_findType, _certificateSubject, false);
 			certStore.Close();
 
 			return certificateCollection;

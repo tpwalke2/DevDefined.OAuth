@@ -48,7 +48,7 @@ namespace DevDefined.OAuth.Provider.Inspectors
 
 		public virtual void InspectContext(ProviderPhase phase, IOAuthContext context)
 		{
-			SigningContext signingContext = CreateSignatureContextForConsumer(context);
+			var signingContext = CreateSignatureContextForConsumer(context);
 
 			if (!_signer.ValidateSignature(context, signingContext))
 			{

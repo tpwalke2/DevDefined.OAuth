@@ -39,7 +39,7 @@ namespace DevDefined.OAuth.Testing
 
 		public bool RecordNonceAndCheckIsUnique(IConsumer consumer, string nonce)
 		{
-			List<string> list = GetNonceListForConsumer(consumer.ConsumerKey);
+			var list = GetNonceListForConsumer(consumer.ConsumerKey);
 			lock (list)
 			{
 				if (list.Contains(nonce)) return false;

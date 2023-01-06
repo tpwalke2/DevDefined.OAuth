@@ -57,14 +57,14 @@ namespace DevDefined.OAuth.Provider.Inspectors
 
 		void ValidateVerifierMatchesStoredVerifier(IOAuthContext context)
 		{
-			string actual = context.Verifier;
+			var actual = context.Verifier;
 
 			if (string.IsNullOrEmpty(actual))
 			{
 				throw Error.MissingRequiredOAuthParameter(context, Parameters.OAuth_Verifier);
 			}
 
-			string expected = _tokenStore.GetVerificationCodeForRequestToken(context);
+			var expected = _tokenStore.GetVerificationCodeForRequestToken(context);
 
 			if (expected != actual.Trim())
 			{

@@ -146,7 +146,7 @@ namespace DevDefined.OAuth.Framework
 			{
 				_rawUri = value;
 
-				NameValueCollection newParameters = HttpUtility.ParseQueryString(_rawUri.Query);
+				var newParameters = HttpUtility.ParseQueryString(_rawUri.Query);
 
 				// TODO: tidy this up, bit clunky
 
@@ -270,7 +270,7 @@ namespace DevDefined.OAuth.Framework
 		{
 			var builder = new UriBuilder(NormalizedRequestUrl);
 
-			IEnumerable<QueryParameter> parameters = QueryParameters.ToQueryParametersExcludingTokenSecret();
+			var parameters = QueryParameters.ToQueryParametersExcludingTokenSecret();
 
 			builder.Query = UriUtility.FormatQueryString(parameters);
 
@@ -292,7 +292,7 @@ namespace DevDefined.OAuth.Framework
 
 			if (Realm != null) builder.Append("realm=\"").Append(Realm).Append("\"");
 
-			IEnumerable<QueryParameter> parameters =
+			var parameters =
 				AuthorizationHeaderParameters.ToQueryParametersExcludingTokenSecret();
 
 			foreach (
@@ -313,7 +313,7 @@ namespace DevDefined.OAuth.Framework
 		{
 			var builder = new UriBuilder(NormalizedRequestUrl);
 
-			IEnumerable<QueryParameter> parameters = QueryParameters.ToQueryParameters()
+			var parameters = QueryParameters.ToQueryParameters()
 				.Where(q => !q.Key.StartsWith(Parameters.OAuthParameterPrefix) &&
 				            !q.Key.StartsWith(Parameters.XAuthParameterPrefix));
 
@@ -329,7 +329,7 @@ namespace DevDefined.OAuth.Framework
 
 		public string GenerateBodyHash()
 		{
-			byte[] hash = SHA1.Create().ComputeHash((RawContent ?? new byte[0]));
+			var hash = SHA1.Create().ComputeHash((RawContent ?? new byte[0]));
 			return Convert.ToBase64String(hash);
 		}
 
@@ -376,7 +376,7 @@ namespace DevDefined.OAuth.Framework
 
 			allParameters.RemoveAll(param => param.Key == Parameters.OAuth_Signature);
 
-			string signatureBase =
+			var signatureBase =
 				UriUtility.FormatParameters(RequestMethod, new Uri(NormalizedRequestUrl), allParameters);
 
 			return signatureBase;

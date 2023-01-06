@@ -41,7 +41,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 			var session = new OAuthSession(consumerContext, "http://localhost/request",
 			                               "http://localhost/userauth", "http://localhost/access", "http://localhost/callback");
 
-			RequestDescription description = session.BuildRequestTokenContext("POST").GetRequestDescription();
+			var description = session.BuildRequestTokenContext("POST").GetRequestDescription();
 
 			Assert.Contains("oauth_callback=http%3A%2F%2Flocalhost%2Fcallback", description.Body);
 		}
@@ -53,7 +53,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 
 			var session = new OAuthSession(consumerContext, "http://localhost/request", "http://localhost/userauth", "http://localhost/access");
 
-			RequestDescription description = session.BuildRequestTokenContext("POST").GetRequestDescription();
+			var description = session.BuildRequestTokenContext("POST").GetRequestDescription();
 
 			Assert.Contains("oauth_callback=oob", description.Body);
 		}
@@ -66,7 +66,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 			var session = new OAuthSession(consumerContext, "http://localhost/request",
 			                               "http://localhost/userauth", "http://localhost/access");
 
-			RequestDescription description = session.BuildRequestTokenContext("GET").GetRequestDescription();
+			var description = session.BuildRequestTokenContext("GET").GetRequestDescription();
 
 			Assert.Null(description.Body);
 			Assert.Null(description.ContentType);
@@ -78,7 +78,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 		{
 			var session = new OAuthSession(new OAuthConsumerContext(), "http://localhost/request",
 			                               "http://localhost/userauth", "http://localhost/access");
-			string actual = session.GetUserAuthorizationUrlForToken(new TokenBase {Token = "token"},
+			var actual = session.GetUserAuthorizationUrlForToken(new TokenBase {Token = "token"},
 			                                                        "http://localhost/callback");
 			Assert.Equal(
 				"http://localhost/userauth?oauth_token=token&oauth_callback=http%3A%2F%2Flocalhost%2Fcallback", actual);
@@ -89,7 +89,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 		{
 			var session = new OAuthSession(new OAuthConsumerContext(), "http://localhost/request",
 			                               "http://localhost/userauth", "http://localhost/access");
-			string actual = session.GetUserAuthorizationUrlForToken(new TokenBase {Token = "token"}, null);
+			var actual = session.GetUserAuthorizationUrlForToken(new TokenBase {Token = "token"}, null);
 			Assert.Equal("http://localhost/userauth?oauth_token=token", actual);
 		}
 
@@ -101,7 +101,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 
 			var accessToken = new TokenBase {ConsumerKey = "consumer", Token = "token", TokenSecret = "secret"};
 
-			RequestDescription description = session
+			var description = session
 				.Request(accessToken)
 				.Post()
 				.ForUrl("http://localhost/")
@@ -119,7 +119,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 
 			var accessToken = new TokenBase {ConsumerKey = "consumer", Token = "token", TokenSecret = "secret"};
 
-			RequestDescription description = session
+			var description = session
 				.Request(accessToken)
 				.Post()
 				.ForUrl("http://localhost/")
@@ -137,7 +137,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 
 			var accessToken = new TokenBase {ConsumerKey = "consumer", Token = "token", TokenSecret = "secret"};
 
-			RequestDescription description = session
+			var description = session
 				.Request(accessToken)
 				.Get()
 				.ForUrl("http://localhost/")
@@ -155,16 +155,16 @@ namespace DevDefined.OAuth.Tests.Consumer
 
 			var accessToken = new TokenBase {ConsumerKey = "consumer", Token = "token", TokenSecret = "secret"};
 
-			byte[] rawContents = Encoding.UTF8.GetBytes("Hello World!");
+			var rawContents = Encoding.UTF8.GetBytes("Hello World!");
 
-			IConsumerRequest content = session
+			var content = session
 				.EnableOAuthRequestBodyHashes()
 				.Request(accessToken)
 				.Post()
 				.ForUrl("http://localhost/resource")
 				.WithRawContent(rawContents);
 
-			RequestDescription description = content.GetRequestDescription();
+			var description = content.GetRequestDescription();
 
 			Assert.Equal(rawContents, description.RawBody);
 

@@ -46,9 +46,9 @@ namespace DevDefined.OAuth.Utility
 
 			var chars = new char[length];
 
-			int allowableLength = AllowableCharacters.Length;
+			var allowableLength = AllowableCharacters.Length;
 
-			for (int i = 0; i < length; i++)
+			for (var i = 0; i < length; i++)
 			{
 				chars[i] = AllowableCharacters[random.Next(allowableLength)];
 			}

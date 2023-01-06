@@ -60,7 +60,7 @@ namespace DevDefined.OAuth.Framework.Signing
 
 		IContextSignatureImplementation FindImplementationForAuthContext(IOAuthContext authContext)
 		{
-			IContextSignatureImplementation impl =
+			var impl =
 				_implementations.FirstOrDefault(i => i.MethodName == authContext.SignatureMethod);
 
 			if (impl != null) return impl;

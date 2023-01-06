@@ -77,7 +77,7 @@ namespace DevDefined.OAuth.Consumer
 
 			context.Nonce = NonceGenerator.GenerateNonce(context);
 
-			string signatureBase = context.GenerateSignatureBase();
+			var signatureBase = context.GenerateSignatureBase();
 
 			_signer.SignContext(context,
 			                    new SigningContext

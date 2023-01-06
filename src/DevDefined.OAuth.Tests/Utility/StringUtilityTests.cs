@@ -40,21 +40,21 @@ namespace DevDefined.OAuth.Tests.Utility
 
 			const int numberOfTimestoCompare = 10000;
 
-			string value = GenerateTestString(1.0, length);
+			var value = GenerateTestString(1.0, length);
 
-			long[] rangesOfTime = Enumerable.Range(0, 100)
+			var rangesOfTime = Enumerable.Range(0, 100)
 				.Select(range => GenerateTestString((range/100.0), length)).ToArray()
 				.Select(other => TimeCompareValuesOverIterationsConstantTime(value, other, numberOfTimestoCompare))
 				.ToArray();
 
-			long[] stringEqualsRangesOfTime = Enumerable.Range(0, 100)
+			var stringEqualsRangesOfTime = Enumerable.Range(0, 100)
 				.Select(range => GenerateTestString((range/100.0), length)).ToArray()
 				.Select(other => TimeCompareValuesOverIterationsStringEquals(value, other, numberOfTimestoCompare))
 				.ToArray();
 
-			decimal percentDifference = CalculatePercentageDifference(rangesOfTime);
+			var percentDifference = CalculatePercentageDifference(rangesOfTime);
 
-			decimal percentDifferenceStringEquals = CalculatePercentageDifference(stringEqualsRangesOfTime);
+			var percentDifferenceStringEquals = CalculatePercentageDifference(stringEqualsRangesOfTime);
 
 			Assert.True(percentDifference < 0.50m, string.Format("Difference in time when calculating is never greater then 50%, but was: {0:0.00%}", percentDifference));
 
@@ -85,14 +85,14 @@ namespace DevDefined.OAuth.Tests.Utility
 		[InlineData("", "")]
 		public void EqualsInConstantTime_ReturnsSameResults_AsStringEquals(string value, string other)
 		{
-			bool expected = string.Equals(value, other);
+			var expected = string.Equals(value, other);
 			Assert.Equal(expected, value.EqualsInConstantTime(other));
 		}
 
 		static string GenerateTestString(double percentMatch, int length)
 		{
 			var matchLength = (int) (percentMatch*length);
-			int nonMatchLength = length - matchLength;
+			var nonMatchLength = length - matchLength;
 
 			if (nonMatchLength == 0) return new string('X', length);
 
@@ -101,18 +101,18 @@ namespace DevDefined.OAuth.Tests.Utility
 
 		static decimal CalculatePercentageDifference(long[] rangesOfTime)
 		{
-			long maxTime = rangesOfTime.Max();
+			var maxTime = rangesOfTime.Max();
 
-			long minTime = rangesOfTime.Min();
+			var minTime = rangesOfTime.Min();
 
 			return 1.0m - ((1.0m/maxTime)*minTime);
 		}
 
 		public long TimeCompareValuesOverIterationsConstantTime(string value, string other, int iterations)
 		{
-			Stopwatch stopWatch = Stopwatch.StartNew();
+			var stopWatch = Stopwatch.StartNew();
 
-			for (int i = 0; i < iterations; i++)
+			for (var i = 0; i < iterations; i++)
 			{
 				value.EqualsInConstantTime(other);
 			}
@@ -122,9 +122,9 @@ namespace DevDefined.OAuth.Tests.Utility
 
 		public long TimeCompareValuesOverIterationsStringEquals(string value, string other, int iterations)
 		{
-			Stopwatch stopWatch = Stopwatch.StartNew();
+			var stopWatch = Stopwatch.StartNew();
 
-			for (int i = 0; i < iterations; i++)
+			for (var i = 0; i < iterations; i++)
 			{
 				value.Equals(other);
 			}

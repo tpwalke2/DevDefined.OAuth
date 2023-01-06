@@ -53,13 +53,13 @@ namespace DevDefined.OAuth.Framework
 			// Microsoft documentation http://msdn.microsoft.com/en-us/library/system.uri.escapedatastring.aspx
 			var escaped = new StringBuilder();
 			const int maxChunkSize = 32766;
-			for (int i = 0; i <= value.Length; i += maxChunkSize)
+			for (var i = 0; i <= value.Length; i += maxChunkSize)
 			{
-				string substring = value.Substring(i, Math.Min(value.Length - i, maxChunkSize));
+				var substring = value.Substring(i, Math.Min(value.Length - i, maxChunkSize));
 				escaped.Append(Uri.EscapeDataString(substring));
 			}
 
-			for (int i = 0; i < UriRfc3986CharsToEscape.Length; i++)
+			for (var i = 0; i < UriRfc3986CharsToEscape.Length; i++)
 			{
 				escaped.Replace(UriRfc3986CharsToEscape[i], HexEscapedUriRfc3986CharsToEscape[i]);
 			}
@@ -83,14 +83,14 @@ namespace DevDefined.OAuth.Framework
 
 			if (!string.IsNullOrEmpty(parameters))
 			{
-				string[] p = parameters.Split('&');
-				foreach (string s in p)
+				var p = parameters.Split('&');
+				foreach (var s in p)
 				{
 					if (!string.IsNullOrEmpty(s) && !s.StartsWith(Parameters.OAuthParameterPrefix) && !s.StartsWith(Parameters.XAuthParameterPrefix))
 					{
 						if (s.IndexOf('=') > -1)
 						{
-							string[] temp = s.Split('=');
+							var temp = s.Split('=');
 							result.Add(new QueryParameter(temp[0], temp[1]));
 						}
 						else
@@ -124,12 +124,12 @@ namespace DevDefined.OAuth.Framework
 
 			if (!string.IsNullOrEmpty(parameters))
 			{
-				string[] p = parameters.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+				var p = parameters.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
 
-				foreach (string s in p)
+				foreach (var s in p)
 				{
 					if (string.IsNullOrEmpty(s)) continue;
-					QueryParameter parameter = ParseAuthorizationHeaderKeyValuePair(s);					
+					var parameter = ParseAuthorizationHeaderKeyValuePair(s);					
 					result.Add(parameter);
 				}
 			}
@@ -139,15 +139,15 @@ namespace DevDefined.OAuth.Framework
 
 		public static QueryParameter ParseAuthorizationHeaderKeyValuePair(string keyEqualValuePair)
 		{
-			int indexOfEqualSign = keyEqualValuePair.IndexOf('=');
+			var indexOfEqualSign = keyEqualValuePair.IndexOf('=');
 
 			if (indexOfEqualSign > 0)
 			{
-				string key = keyEqualValuePair.Substring(0, indexOfEqualSign).Trim();
+				var key = keyEqualValuePair.Substring(0, indexOfEqualSign).Trim();
 
-				string quotedValue = keyEqualValuePair.Substring(indexOfEqualSign + 1);
+				var quotedValue = keyEqualValuePair.Substring(indexOfEqualSign + 1);
 
-				string itemValue = StripQuotes(quotedValue);
+				var itemValue = StripQuotes(quotedValue);
 
 				itemValue = HttpUtility.UrlDecode(itemValue);
 
@@ -159,7 +159,7 @@ namespace DevDefined.OAuth.Framework
 
 		static string StripQuotes(string quotedValue)
 		{
-			foreach (string quoteCharacter in QuoteCharacters)
+			foreach (var quoteCharacter in QuoteCharacters)
 			{
 				if (quotedValue.StartsWith(quoteCharacter) && quotedValue.EndsWith(quoteCharacter) && quotedValue.Length > 1)
 				{
@@ -228,7 +228,7 @@ namespace DevDefined.OAuth.Framework
 		/// <returns></returns>
 		public static string FormatParameters(string httpMethod, Uri url, List<QueryParameter> parameters)
 		{
-			string normalizedRequestParameters = NormalizeRequestParameters(parameters);
+			var normalizedRequestParameters = NormalizeRequestParameters(parameters);
 
 			var signatureBase = new StringBuilder();
 			signatureBase.AppendFormat("{0}&", httpMethod.ToUpper());
@@ -246,7 +246,7 @@ namespace DevDefined.OAuth.Framework
 		/// <returns></returns>
 		public static string NormalizeRequestParameters(IEnumerable<QueryParameter> parameters)
 		{
-			IEnumerable<QueryParameter> orderedParameters = parameters
+			var orderedParameters = parameters
 				.OrderBy(x => x.Key, StringComparer.Ordinal)
 				.ThenBy(x => x.Value)
 				.Select(
@@ -272,7 +272,7 @@ namespace DevDefined.OAuth.Framework
 		/// <returns></returns>
 		public static string NormalizeUri(Uri uri)
 		{
-			string normalizedUrl = string.Format("{0}://{1}", uri.Scheme, uri.Host);
+			var normalizedUrl = string.Format("{0}://{1}", uri.Scheme, uri.Host);
 
 			if (!((uri.Scheme == "http" && uri.Port == 80) ||
 			      (uri.Scheme == "https" && uri.Port == 443)))
@@ -285,7 +285,7 @@ namespace DevDefined.OAuth.Framework
 
 		public static IEnumerable<QueryParameter> ToQueryParameters(this NameValueCollection source)
 		{
-			foreach (string key in source.AllKeys)
+			foreach (var key in source.AllKeys)
 			{
 				yield return new QueryParameter(key, source[key]);
 			}
@@ -293,7 +293,7 @@ namespace DevDefined.OAuth.Framework
 
 		public static IEnumerable<QueryParameter> ToQueryParametersExcludingTokenSecret(this NameValueCollection source)
 		{
-			foreach (string key in source.AllKeys)
+			foreach (var key in source.AllKeys)
 			{
 				if (key != Parameters.OAuth_Token_Secret)
 				{

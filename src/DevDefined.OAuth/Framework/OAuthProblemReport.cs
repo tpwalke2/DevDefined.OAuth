@@ -58,14 +58,14 @@ namespace DevDefined.OAuth.Framework
 
 			if (parameters.AllKeys.Any(key => key == Parameters.OAuth_Acceptable_Timestamps))
 			{
-				string[] timeStamps = parameters[Parameters.OAuth_Acceptable_Timestamps].Split(new[] {'-'});
+				var timeStamps = parameters[Parameters.OAuth_Acceptable_Timestamps].Split(new[] {'-'});
 				AcceptableTimeStampsFrom = DateTimeUtility.FromEpoch(Convert.ToInt64(timeStamps[0]));
 				AcceptableTimeStampsTo = DateTimeUtility.FromEpoch(Convert.ToInt64(timeStamps[1]));
 			}
 
 			if (parameters.AllKeys.Any(key => key == Parameters.OAuth_Acceptable_Versions))
 			{
-				string[] versions = parameters[Parameters.OAuth_Acceptable_Versions].Split(new[] {'-'});
+				var versions = parameters[Parameters.OAuth_Acceptable_Versions].Split(new[] {'-'});
 				AcceptableVersionFrom = versions[0];
 				AcceptableVersionTo = versions[1];
 			}
@@ -128,7 +128,7 @@ namespace DevDefined.OAuth.Framework
 		{
 			var builder = new StringBuilder();
 
-			foreach (string name in names)
+			foreach (var name in names)
 			{
 				if (builder.Length > 0) builder.Append("&");
 				builder.Append(UriUtility.UrlEncode(name));

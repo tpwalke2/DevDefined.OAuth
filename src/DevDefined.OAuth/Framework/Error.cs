@@ -78,7 +78,7 @@ namespace DevDefined.OAuth.Framework
             {
                 using (var reader = new StreamReader(innerException.Response.GetResponseStream()))
                 {
-                    string body = reader.ReadToEnd();
+                    var body = reader.ReadToEnd();
 
                     return
                         new Exception(
@@ -136,7 +136,7 @@ namespace DevDefined.OAuth.Framework
 
         public static Exception AccessDeniedToProtectedResource(AccessOutcome outcome)
         {
-            Uri uri = outcome.Context.GenerateUri();
+            var uri = outcome.Context.GenerateUri();
 
             if (string.IsNullOrEmpty(outcome.AdditionalInfo))
             {

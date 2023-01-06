@@ -157,7 +157,7 @@ namespace DevDefined.OAuth.Consumer
 
 		public static string ReadBody(this IConsumerRequest request)
 		{
-			HttpWebResponse response = request.ToWebResponse();
+			var response = request.ToWebResponse();
 
 			return response.ReadToEnd();
 		}

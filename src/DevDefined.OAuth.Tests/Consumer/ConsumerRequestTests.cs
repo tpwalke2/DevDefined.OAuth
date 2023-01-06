@@ -50,7 +50,7 @@ namespace DevDefined.OAuth.Tests.Consumer
 		{
 			context.Headers["a-key"] = "a-value";
 			var request = new ConsumerRequest(context, consumerContext, accessToken);
-			RequestDescription description = request.GetRequestDescription();
+			var description = request.GetRequestDescription();
 			Assert.Equal("a-value", description.Headers["a-key"]);
 		}
 	}

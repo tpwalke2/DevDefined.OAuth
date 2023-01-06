@@ -122,7 +122,7 @@ namespace DevDefined.OAuth.Provider
 
         void ApplyInspectors(IOAuthContext context, ProviderPhase phase)
         {
-            foreach (IContextInspector inspector in _inspectors)
+            foreach (var inspector in _inspectors)
             {
                 inspector.InspectContext(phase, context);
             }
@@ -132,13 +132,13 @@ namespace DevDefined.OAuth.Provider
         {
             if (phase == ProviderPhase.ExchangeRequestTokenForAccessToken)
             {
-                string secret = _tokenStore.GetRequestTokenSecret(context);
+                var secret = _tokenStore.GetRequestTokenSecret(context);
                 context.TokenSecret = secret;
             }
 
             else if (phase == ProviderPhase.AccessProtectedResourceRequest || phase == ProviderPhase.RenewAccessToken)
             {
-                string secret = _tokenStore.GetAccessTokenSecret(context);
+                var secret = _tokenStore.GetAccessTokenSecret(context);
 
                 context.TokenSecret = secret;
             }

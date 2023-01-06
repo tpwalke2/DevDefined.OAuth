@@ -37,12 +37,12 @@ namespace DevDefined.OAuth.Utility
 				throw new ArgumentNullException("target");
 			}
 
-			Type targetType = target.GetType();
+			var targetType = target.GetType();
 
-			foreach (PropertyInfo property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+			foreach (var property in targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
 			{
 				if (!property.CanRead) continue;
-				object value = property.GetValue(target, null);
+				var value = property.GetValue(target, null);
 
 				_properties[property.Name] = value;
 			}
@@ -249,7 +249,7 @@ namespace DevDefined.OAuth.Utility
 
 			public bool MoveNext()
 			{
-				bool moved = _enumerator.MoveNext();
+				var moved = _enumerator.MoveNext();
 
 				if (moved)
 				{

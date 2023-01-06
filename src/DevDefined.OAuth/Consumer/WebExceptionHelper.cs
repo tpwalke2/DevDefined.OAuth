@@ -45,7 +45,7 @@ namespace DevDefined.OAuth.Consumer
 		{
 			try
 			{
-				string content = webEx.Response.ReadToEnd();
+				var content = webEx.Response.ReadToEnd();
 
 				if (responseBodyAction != null)
 				{

@@ -78,7 +78,7 @@ namespace DevDefined.OAuth.KeyInterop
 				return false;
 			}
 
-			for (int i = 0; i < first.Length; i++)
+			for (var i = 0; i < first.Length; i++)
 			{
 				if (first[i] != second[i])
 				{
@@ -97,10 +97,10 @@ namespace DevDefined.OAuth.KeyInterop
 			byte[] value = null;
 
 			// Sanity Check
-			int length = 0;
+			var length = 0;
 
 			// Checkpoint
-			int position = parser.CurrentPosition();
+			var position = parser.CurrentPosition();
 
 			// Ignore Sequence - PublicKeyInfo
 			length = parser.NextSequence();
@@ -193,10 +193,10 @@ namespace DevDefined.OAuth.KeyInterop
 			byte[] value = null;
 
 			// Checkpoint
-			int position = parser.CurrentPosition();
+			var position = parser.CurrentPosition();
 
 			// Sanity Check
-			int length = 0;
+			var length = 0;
 
 			// Ignore Sequence - PrivateKeyInfo
 			length = parser.NextSequence();
@@ -320,9 +320,9 @@ namespace DevDefined.OAuth.KeyInterop
 			byte[] value = null;
 
 			// Current Position
-			int position = parser.CurrentPosition();
+			var position = parser.CurrentPosition();
 			// Sanity Checks
-			int length = 0;
+			var length = 0;
 
 			// Ignore Sequence - PublicKeyInfo
 			length = parser.NextSequence();
@@ -398,9 +398,9 @@ namespace DevDefined.OAuth.KeyInterop
 			byte[] value = null;
 
 			// Current Position
-			int position = parser.CurrentPosition();
+			var position = parser.CurrentPosition();
 			// Sanity Checks
-			int length = 0;
+			var length = 0;
 
 			// Ignore Sequence - PrivateKeyInfo
 			length = parser.NextSequence();
@@ -502,20 +502,20 @@ namespace DevDefined.OAuth.KeyInterop
 
 		int GetLength()
 		{
-			int length = 0;
+			var length = 0;
 
 			// Checkpoint
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 
 				if (b == (b & 0x7f))
 				{
 					return b;
 				}
-				int i = b & 0x7f;
+				var i = b & 0x7f;
 
 				if (i > 4)
 				{
@@ -543,15 +543,15 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public byte[] Next()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
 #pragma warning disable 0219
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 #pragma warning restore 0219
 
-				int length = GetLength();
+				var length = GetLength();
 				if (length > RemainingBytes())
 				{
 					var sb = new StringBuilder("Incorrect Size. ");
@@ -572,7 +572,7 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public byte GetNextOctet()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			if (0 == RemainingBytes())
 			{
@@ -583,14 +583,14 @@ namespace DevDefined.OAuth.KeyInterop
 				throw new BerDecodeException(sb.ToString(), position);
 			}
 
-			byte b = GetOctets(1)[0];
+			var b = GetOctets(1)[0];
 
 			return b;
 		}
 
 		public byte[] GetOctets(int octetCount)
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			if (octetCount > RemainingBytes())
 			{
@@ -624,11 +624,11 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public int NextNull()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 				if (0x05 != b)
 				{
 					var sb = new StringBuilder("Expected Null. ");
@@ -661,11 +661,11 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public int NextSequence()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 				if (0x30 != b)
 				{
 					var sb = new StringBuilder("Expected Sequence. ");
@@ -674,7 +674,7 @@ namespace DevDefined.OAuth.KeyInterop
 					throw new BerDecodeException(sb.ToString(), position);
 				}
 
-				int length = GetLength();
+				var length = GetLength();
 				if (length > RemainingBytes())
 				{
 					var sb = new StringBuilder("Incorrect Sequence Size. ");
@@ -700,11 +700,11 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public int NextOctetString()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 				if (0x04 != b)
 				{
 					var sb = new StringBuilder("Expected Octet String. ");
@@ -712,7 +712,7 @@ namespace DevDefined.OAuth.KeyInterop
 					throw new BerDecodeException(sb.ToString(), position);
 				}
 
-				int length = GetLength();
+				var length = GetLength();
 				if (length > RemainingBytes())
 				{
 					var sb = new StringBuilder("Incorrect Octet String Size. ");
@@ -738,11 +738,11 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public int NextBitString()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 				if (0x03 != b)
 				{
 					var sb = new StringBuilder("Expected Bit String. ");
@@ -750,7 +750,7 @@ namespace DevDefined.OAuth.KeyInterop
 					throw new BerDecodeException(sb.ToString(), position);
 				}
 
-				int length = GetLength();
+				var length = GetLength();
 
 				// We need to consume unused bits, which is the first
 				//   octet of the remaing values
@@ -779,11 +779,11 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public byte[] NextInteger()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 				if (0x02 != b)
 				{
 					var sb = new StringBuilder("Expected Integer. ");
@@ -791,7 +791,7 @@ namespace DevDefined.OAuth.KeyInterop
 					throw new BerDecodeException(sb.ToString(), position);
 				}
 
-				int length = GetLength();
+				var length = GetLength();
 				if (length > RemainingBytes())
 				{
 					var sb = new StringBuilder("Incorrect Integer Size. ");
@@ -812,11 +812,11 @@ namespace DevDefined.OAuth.KeyInterop
 
 		public byte[] NextOID()
 		{
-			int position = CurrentPosition();
+			var position = CurrentPosition();
 
 			try
 			{
-				byte b = GetNextOctet();
+				var b = GetNextOctet();
 				if (0x06 != b)
 				{
 					var sb = new StringBuilder("Expected Object Identifier. ");
@@ -825,7 +825,7 @@ namespace DevDefined.OAuth.KeyInterop
 					throw new BerDecodeException(sb.ToString(), position);
 				}
 
-				int length = GetLength();
+				var length = GetLength();
 				if (length > RemainingBytes())
 				{
 					var sb = new StringBuilder("Incorrect Object Identifier Size. ");
@@ -837,7 +837,7 @@ namespace DevDefined.OAuth.KeyInterop
 
 				var values = new byte[length];
 
-				for (int i = 0; i < length; i++)
+				for (var i = 0; i < length; i++)
 				{
 					values[i] = octets[0];
 					octets.RemoveAt(0);

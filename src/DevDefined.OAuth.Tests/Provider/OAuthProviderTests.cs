@@ -83,9 +83,9 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void AccessProtectedResource()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.RsaSha1);
+			var session = CreateConsumer(SignatureMethod.RsaSha1);
 			session.AccessToken = new TokenBase {ConsumerKey = "key", Token = "accesskey", TokenSecret = "accesssecret"};
-			IOAuthContext context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
+			var context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
 			context.TokenSecret = null;
 			provider.AccessProtectedResourceRequest(context);
 		}
@@ -93,9 +93,9 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void AccessProtectedResourceWithPlainText()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.PlainText);
+			var session = CreateConsumer(SignatureMethod.PlainText);
 			session.AccessToken = new TokenBase {ConsumerKey = "key", Token = "accesskey", TokenSecret = "accesssecret"};
-			IOAuthContext context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
+			var context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
 			context.TokenSecret = null;
 			provider.AccessProtectedResourceRequest(context);
 		}
@@ -103,12 +103,12 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void ExchangeRequestTokenForAccessToken()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.RsaSha1);
-			IOAuthContext context =
+			var session = CreateConsumer(SignatureMethod.RsaSha1);
+			var context =
 				session.BuildExchangeRequestTokenForAccessTokenContext(
 					new TokenBase {ConsumerKey = "key", Token = "requestkey", TokenSecret = "requestsecret"}, "GET", null).Context;
 			context.TokenSecret = null;
-			IToken accessToken = provider.ExchangeRequestTokenForAccessToken(context);
+			var accessToken = provider.ExchangeRequestTokenForAccessToken(context);
 			Assert.Equal("accesskey", accessToken.Token);
 			Assert.Equal("accesssecret", accessToken.TokenSecret);
 		}
@@ -116,12 +116,12 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void ExchangeRequestTokenForAccessTokenPlainText()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.PlainText);
-			IOAuthContext context =
+			var session = CreateConsumer(SignatureMethod.PlainText);
+			var context =
 				session.BuildExchangeRequestTokenForAccessTokenContext(
 					new TokenBase {ConsumerKey = "key", Token = "requestkey", TokenSecret = "requestsecret"}, "GET", null).Context;
 			context.TokenSecret = null;
-			IToken accessToken = provider.ExchangeRequestTokenForAccessToken(context);
+			var accessToken = provider.ExchangeRequestTokenForAccessToken(context);
 			Assert.Equal("accesskey", accessToken.Token);
 			Assert.Equal("accesssecret", accessToken.TokenSecret);
 		}
@@ -129,8 +129,8 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void ExchangeTokensWhenVerifierIsMatchDoesNotThrowException()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.RsaSha1);
-			IOAuthContext context = session.BuildExchangeRequestTokenForAccessTokenContext(
+			var session = CreateConsumer(SignatureMethod.RsaSha1);
+			var context = session.BuildExchangeRequestTokenForAccessTokenContext(
 				new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "GzvVb5WjWfHKa/0JuFupaMyn").Context;
 			provider.ExchangeRequestTokenForAccessToken(context);
 		}
@@ -138,9 +138,9 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void RequestTokenWithHmacSha1()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.HmacSha1);
-			IOAuthContext context = session.BuildRequestTokenContext("GET").Context;
-			IToken token = provider.GrantRequestToken(context);
+			var session = CreateConsumer(SignatureMethod.HmacSha1);
+			var context = session.BuildRequestTokenContext("GET").Context;
+			var token = provider.GrantRequestToken(context);
 			Assert.Equal("requestkey", token.Token);
 			Assert.Equal("requestsecret", token.TokenSecret);
 		}
@@ -148,8 +148,8 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void RequestTokenWithHmacSha1WithInvalidSignatureThrows()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.HmacSha1);
-			IOAuthContext context = session.BuildRequestTokenContext("GET").Context;
+			var session = CreateConsumer(SignatureMethod.HmacSha1);
+			var context = session.BuildRequestTokenContext("GET").Context;
 			context.Signature = "wrong";
 			var ex = Assert.Throws<OAuthException>(() => (provider.GrantRequestToken(context)));
 			Assert.Equal("Failed to validate signature", ex.Message);
@@ -158,9 +158,9 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void RequestTokenWithInvalidConsumerKeyThrowsException()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.PlainText);
+			var session = CreateConsumer(SignatureMethod.PlainText);
 			session.ConsumerContext.ConsumerKey = "invalid";
-			IOAuthContext context = session.BuildRequestTokenContext("GET").Context;
+			var context = session.BuildRequestTokenContext("GET").Context;
 			var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
 			Assert.Equal("Unknown Consumer (Realm: , Key: invalid)", ex.Message);
 		}
@@ -168,9 +168,9 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void RequestTokenWithPlainText()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.PlainText);
-			IOAuthContext context = session.BuildRequestTokenContext("GET").Context;
-			IToken token = provider.GrantRequestToken(context);
+			var session = CreateConsumer(SignatureMethod.PlainText);
+			var context = session.BuildRequestTokenContext("GET").Context;
+			var token = provider.GrantRequestToken(context);
 			Assert.Equal("requestkey", token.Token);
 			Assert.Equal("requestsecret", token.TokenSecret);
 		}
@@ -178,9 +178,9 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void RequestTokenWithRsaSha1()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.RsaSha1);
-			IOAuthContext context = session.BuildRequestTokenContext("GET").Context;
-			IToken token = provider.GrantRequestToken(context);
+			var session = CreateConsumer(SignatureMethod.RsaSha1);
+			var context = session.BuildRequestTokenContext("GET").Context;
+			var token = provider.GrantRequestToken(context);
 			Assert.Equal("requestkey", token.Token);
 			Assert.Equal("requestsecret", token.TokenSecret);
 		}
@@ -188,8 +188,8 @@ namespace DevDefined.OAuth.Tests.Provider
 		[Fact]
 		public void RequestTokenWithRsaSha1WithInvalidSignatureThrows()
 		{
-			IOAuthSession session = CreateConsumer(SignatureMethod.RsaSha1);
-			IOAuthContext context = session.BuildRequestTokenContext("GET").Context;
+			var session = CreateConsumer(SignatureMethod.RsaSha1);
+			var context = session.BuildRequestTokenContext("GET").Context;
 			context.Signature =
 				"eeh8hLNIlNNq1Xrp7BOCc+xgY/K8AmjxKNM7UdLqqcvNSmJqcPcf7yQIOvu8oj5R/mDvBpSb3+CEhxDoW23gggsddPIxNdOcDuEOenugoCifEY6nRz8sbtYt3GHXsDS2esEse/N8bWgDdOm2FRDKuy9OOluQuKXLjx5wkD/KYMY=";
 			var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
@@ -207,10 +207,10 @@ namespace DevDefined.OAuth.Tests.Provider
     [Fact]
     public void AccessTokenWithHmacSha1()
     {
-      IOAuthSession session = CreateConsumer(SignatureMethod.HmacSha1);
-      IOAuthContext context = session.BuildAccessTokenContext("GET", "client_auth", "username", "password").Context;
+      var session = CreateConsumer(SignatureMethod.HmacSha1);
+      var context = session.BuildAccessTokenContext("GET", "client_auth", "username", "password").Context;
       context.TokenSecret = null;
-      IToken accessToken = provider.CreateAccessToken(context);
+      var accessToken = provider.CreateAccessToken(context);
       Assert.Equal("accesskey", accessToken.Token);
       Assert.Equal("accesssecret", accessToken.TokenSecret);
     }

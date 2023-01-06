@@ -35,7 +35,7 @@ namespace DevDefined.OAuth.Framework
 	{
 		public static IDisposable NoCertificateValidation()
 		{
-			RemoteCertificateValidationCallback oldCallback = ServicePointManager.ServerCertificateValidationCallback;
+			var oldCallback = ServicePointManager.ServerCertificateValidationCallback;
 			ServicePointManager.ServerCertificateValidationCallback = CertificateAlwaysValidCallback;
 			return new DisposableAction(delegate { ServicePointManager.ServerCertificateValidationCallback = oldCallback; });
 		}

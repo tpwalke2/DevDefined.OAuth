@@ -53,9 +53,9 @@ namespace DevDefined.OAuth.Consumer
 		/// <returns>Return an HttpWebRequest with a client certificate attached.</returns>
 		public override HttpWebRequest ToWebRequest()
 		{
-			HttpWebRequest webReqeust = base.ToWebRequest();
+			var webReqeust = base.ToWebRequest();
 
-			X509Certificate2 certificate = _certificateFactory.CreateCertificate();
+			var certificate = _certificateFactory.CreateCertificate();
 
 			// Attach the certificate to the HttpWebRequest
 			if (certificate != null)

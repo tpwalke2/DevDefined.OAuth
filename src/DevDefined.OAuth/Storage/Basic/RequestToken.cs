@@ -43,7 +43,7 @@ namespace DevDefined.OAuth.Storage.Basic
 
 		public override string ToString()
 		{
-			string formattedToken = base.ToString();
+			var formattedToken = base.ToString();
 
 			formattedToken += "&" + Parameters.OAuth_Callback_Confirmed + "=true";
 

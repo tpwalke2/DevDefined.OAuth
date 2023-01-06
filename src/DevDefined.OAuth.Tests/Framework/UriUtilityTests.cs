@@ -37,7 +37,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void GetHeaderParameters_ReturnsAllParameters()
 		{
-			List<QueryParameter> parameters =
+			var parameters =
 				UriUtility.GetHeaderParameters("OAuth realm=\"http:\\\\somerealm.com\", oauth_consumer_key=\"consumerKey\"");
 
 			Assert.Equal(2, parameters.Count);
@@ -48,7 +48,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void GetHeaderParametersWhenAuthorizationHeaderDoesNotContainOAuthReturnsEmptyCollection()
 		{
-			List<QueryParameter> parameters =
+			var parameters =
 				UriUtility.GetHeaderParameters("realm=\"http:\\somerealm.com\", oauth_consumer_key=\"\"");
 
 			Assert.Empty(parameters);
@@ -57,7 +57,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void GetHeaderParametersWhenKeysValueIsEmpty()
 		{
-			List<QueryParameter> parameters =
+			var parameters =
 				UriUtility.GetHeaderParameters("OAuth realm=\"http:\\somerealm.com\", oauth_consumer_key=\"\"");
 
 			Assert.Equal("", parameters.Single(p => p.Key == "oauth_consumer_key").Value);
@@ -66,7 +66,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void GetQueryParametersWithoutQuestionMark()
 		{
-			List<QueryParameter> parameters = UriUtility.GetQueryParameters("key1=value1&key2=value2");
+			var parameters = UriUtility.GetQueryParameters("key1=value1&key2=value2");
 			Assert.Equal(2, parameters.Count);
 			Assert.Equal("value1", parameters.Single(p => p.Key == "key1").Value);
 			Assert.Equal("value2", parameters.Single(p => p.Key == "key2").Value);
@@ -75,7 +75,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void GetQueryParametersWithQuestionMark()
 		{
-			List<QueryParameter> parameters = UriUtility.GetQueryParameters("?key1=value1&key2=value2");
+			var parameters = UriUtility.GetQueryParameters("?key1=value1&key2=value2");
 			Assert.Equal(2, parameters.Count);
 			Assert.Equal("value1", parameters.Single(p => p.Key == "key1").Value);
 			Assert.Equal("value2", parameters.Single(p => p.Key == "key2").Value);
@@ -84,7 +84,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void Issue8_WhenSignatureContainsEqualSign_ParseAuthorizationHeaderKeyValuePairDropsCharactersAfterEqualSign()
 		{
-			string signatureInHeader = "auth_signature=\"uZF3aYQFtyK0F1FFHY+w7/Be+m4=\"";
+			var signatureInHeader = "auth_signature=\"uZF3aYQFtyK0F1FFHY+w7/Be+m4=\"";
 
 			var paramter = UriUtility.ParseAuthorizationHeaderKeyValuePair(signatureInHeader);
 

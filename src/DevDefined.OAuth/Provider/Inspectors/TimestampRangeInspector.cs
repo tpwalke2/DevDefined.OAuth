@@ -55,8 +55,8 @@ namespace DevDefined.OAuth.Provider.Inspectors
 
 		public void InspectContext(ProviderPhase phase, IOAuthContext context)
 		{
-			DateTime timestamp = DateTimeUtility.FromEpoch(Convert.ToInt32(context.Timestamp));
-			DateTime now = _nowFunc();
+			var timestamp = DateTimeUtility.FromEpoch(Convert.ToInt32(context.Timestamp));
+			var now = _nowFunc();
 
 			if (now.Subtract(_maxBeforeNow) > timestamp)
 			{

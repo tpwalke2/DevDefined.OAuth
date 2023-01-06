@@ -39,9 +39,9 @@ namespace DevDefined.OAuth.Utility
 
 		static bool CompareStringsInConstantTime(string value, string other)
 		{
-			int result = 0;
+			var result = 0;
 
-			for (int i = 0; i < value.Length; i++)
+			for (var i = 0; i < value.Length; i++)
 			{
 				result |= value[i] ^ other[i];
 			}

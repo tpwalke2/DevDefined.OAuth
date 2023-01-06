@@ -50,13 +50,13 @@ namespace DevDefined.OAuth.Framework.Signing
 
 		static string GenerateSignature(IToken authContext, SigningContext signingContext)
 		{
-			string consumerSecret = (signingContext.ConsumerSecret != null)
+			var consumerSecret = (signingContext.ConsumerSecret != null)
 			                        	? UriUtility.UrlEncode(signingContext.ConsumerSecret)
 			                        	: "";
-			string tokenSecret = (authContext.TokenSecret != null)
+			var tokenSecret = (authContext.TokenSecret != null)
 			                     	? UriUtility.UrlEncode(authContext.TokenSecret)
 			                     	: null;
-			string hashSource = string.Format("{0}&{1}", consumerSecret, tokenSecret);
+			var hashSource = string.Format("{0}&{1}", consumerSecret, tokenSecret);
 
 			var hashAlgorithm = new HMACSHA1 {Key = Encoding.ASCII.GetBytes(hashSource)};
 
@@ -75,8 +75,8 @@ namespace DevDefined.OAuth.Framework.Signing
 				throw new ArgumentNullException("data");
 			}
 
-			byte[] dataBuffer = Encoding.ASCII.GetBytes(data);
-			byte[] hashBytes = hashAlgorithm.ComputeHash(dataBuffer);
+			var dataBuffer = Encoding.ASCII.GetBytes(data);
+			var hashBytes = hashAlgorithm.ComputeHash(dataBuffer);
 
 			return Convert.ToBase64String(hashBytes);
 		}

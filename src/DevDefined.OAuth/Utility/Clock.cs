@@ -55,7 +55,7 @@ namespace DevDefined.OAuth.Utility
 
 		public static IDisposable Freeze()
 		{
-			DateTime now = Now;
+			var now = Now;
 			return ReplaceImplementation(() => now);
 		}
 
@@ -66,7 +66,7 @@ namespace DevDefined.OAuth.Utility
 
 		public static IDisposable ReplaceImplementation(Func<DateTime> nowFunc)
 		{
-			Func<DateTime> originalFunc = _nowFunc;
+			var originalFunc = _nowFunc;
 			_nowFunc = nowFunc;
 			return new DisposableAction(() => _nowFunc = originalFunc);
 		}

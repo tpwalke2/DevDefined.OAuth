@@ -108,7 +108,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void PopulateFromFormattedMissingParameterReport()
 		{
-			string formatted = "oauth_problem=parameter_absent&oauth_parameters_absent=oauth_nonce";
+			var formatted = "oauth_problem=parameter_absent&oauth_parameters_absent=oauth_nonce";
 
 			var report = new OAuthProblemReport(formatted);
 
@@ -119,7 +119,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void PopulateFromFormattedRejectedParameterReport()
 		{
-			string formatted = "oauth_problem=parameter_rejected&oauth_parameters_rejected=oauth_timestamp";
+			var formatted = "oauth_problem=parameter_rejected&oauth_parameters_rejected=oauth_timestamp";
 
 			var report = new OAuthProblemReport(formatted);
 
@@ -130,7 +130,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void PopulateFromFormattedReportWithAdvice()
 		{
-			string formatted =
+			var formatted =
 				"oauth_problem=consumer_key_refused&oauth_problem_advice=The%20supplied%20consumer%20key%20has%20been%20black-listed%20due%20to%20complaints.";
 
 			var report = new OAuthProblemReport(formatted);
@@ -148,7 +148,7 @@ namespace DevDefined.OAuth.Tests.Framework
 			var toTimestamp = new DateTime(2009, 1, 1);
 			var toStampEpoch = toTimestamp.Epoch();
 			
-			string formatted = $"oauth_problem=timestamp_refused&oauth_acceptable_timestamps={fromTimestampEpoch}-{toStampEpoch}";
+			var formatted = $"oauth_problem=timestamp_refused&oauth_acceptable_timestamps={fromTimestampEpoch}-{toStampEpoch}";
 
 			var report = new OAuthProblemReport(formatted);
 
@@ -160,7 +160,7 @@ namespace DevDefined.OAuth.Tests.Framework
 		[Fact]
 		public void PopulateFromFormattedVersionRangeReport()
 		{
-			string formatted = "oauth_problem=version_rejected&oauth_acceptable_versions=1.0-2.0";
+			var formatted = "oauth_problem=version_rejected&oauth_acceptable_versions=1.0-2.0";
 
 			var report = new OAuthProblemReport(formatted);
 

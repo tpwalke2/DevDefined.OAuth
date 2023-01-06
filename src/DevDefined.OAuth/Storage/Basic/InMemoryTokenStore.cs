@@ -92,7 +92,7 @@ namespace DevDefined.OAuth.Storage.Basic
 		{
 			if (requestContext == null) throw new ArgumentNullException("requestContext");
 
-			RequestToken requestToken = GetRequestToken(requestContext);
+			var requestToken = GetRequestToken(requestContext);
 
 			UseUpRequestToken(requestContext, requestToken);
 
@@ -101,7 +101,7 @@ namespace DevDefined.OAuth.Storage.Basic
 
 		public void ConsumeAccessToken(IOAuthContext accessContext)
 		{
-			AccessToken accessToken = GetAccessToken(accessContext);
+			var accessToken = GetAccessToken(accessContext);
 
 			if (accessToken.ExpiryDate < Clock.Now)
 			{
@@ -111,13 +111,13 @@ namespace DevDefined.OAuth.Storage.Basic
 
 		public IToken GetAccessTokenAssociatedWithRequestToken(IOAuthContext requestContext)
 		{
-			RequestToken requestToken = GetRequestToken(requestContext);
+			var requestToken = GetRequestToken(requestContext);
 			return requestToken.AccessToken;
 		}
 
 		public RequestForAccessStatus GetStatusOfRequestForAccess(IOAuthContext accessContext)
 		{
-			RequestToken request = GetRequestToken(accessContext);
+			var request = GetRequestToken(accessContext);
 
 			if (request.AccessDenied) return RequestForAccessStatus.Denied;
 
@@ -128,27 +128,27 @@ namespace DevDefined.OAuth.Storage.Basic
 
 		public string GetCallbackUrlForToken(IOAuthContext requestContext)
 		{
-			RequestToken requestToken = GetRequestToken(requestContext);
+			var requestToken = GetRequestToken(requestContext);
 			return requestToken.CallbackUrl;
 		}
 
 		public string GetVerificationCodeForRequestToken(IOAuthContext requestContext)
 		{
-			RequestToken requestToken = GetRequestToken(requestContext);
+			var requestToken = GetRequestToken(requestContext);
 
 			return requestToken.Verifier;
 		}
 
 		public string GetRequestTokenSecret(IOAuthContext context)
 		{
-			RequestToken requestToken = GetRequestToken(context);
+			var requestToken = GetRequestToken(context);
 
 			return requestToken.TokenSecret;
 		}
 
 		public string GetAccessTokenSecret(IOAuthContext context)
 		{
-			AccessToken token = GetAccessToken(context);
+			var token = GetAccessToken(context);
 
 			return token.TokenSecret;
 		}

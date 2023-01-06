@@ -37,9 +37,9 @@ namespace DevDefined.OAuth.Tests.Framework
 		{
 			var newYears = new DateTime(2008, 1, 1, 0, 0, 0);
 
-			long epoch = newYears.Epoch();
+			var epoch = newYears.Epoch();
 
-			DateTime fromEpoch = DateTimeUtility.FromEpoch((int) epoch);
+			var fromEpoch = DateTimeUtility.FromEpoch((int) epoch);
 
 			Assert.Equal(newYears, fromEpoch);
 		}
