@@ -89,9 +89,10 @@ public class OAuthProblemReport
 	{
 		if (string.IsNullOrEmpty(Problem)) throw Error.CantBuildProblemReportWhenProblemEmpty();
 
-		var response = new NameValueCollection();
-
-		response[Parameters.OAuth_Problem] = Problem;
+		var response = new NameValueCollection
+		{
+			[Parameters.OAuth_Problem] = Problem
+		};
 
 		if (!string.IsNullOrEmpty(ProblemAdvice))
 		{

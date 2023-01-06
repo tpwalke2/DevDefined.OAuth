@@ -87,51 +87,31 @@ public class OAuthContext : IOAuthContext
 
 	public NameValueCollection Headers
 	{
-		get
-		{
-			if (_headers == null) _headers = new NameValueCollection();
-			return _headers;
-		}
+		get => _headers ??= new NameValueCollection();
 		set => _headers = value;
 	}
 
 	public NameValueCollection QueryParameters
 	{
-		get
-		{
-			if (_queryParameters == null) _queryParameters = new NameValueCollection();
-			return _queryParameters;
-		}
+		get => _queryParameters ??= new NameValueCollection();
 		set => _queryParameters = value;
 	}
 
 	public NameValueCollection Cookies
 	{
-		get
-		{
-			if (_cookies == null) _cookies = new NameValueCollection();
-			return _cookies;
-		}
+		get => _cookies ??= new NameValueCollection();
 		set => _cookies = value;
 	}
 
 	public NameValueCollection FormEncodedParameters
 	{
-		get
-		{
-			if (_formEncodedParameters == null) _formEncodedParameters = new NameValueCollection();
-			return _formEncodedParameters;
-		}
+		get => _formEncodedParameters ??= new NameValueCollection();
 		set => _formEncodedParameters = value;
 	}
 
 	public NameValueCollection AuthorizationHeaderParameters
 	{
-		get
-		{
-			if (_authorizationHeaderParameters == null) _authorizationHeaderParameters = new NameValueCollection();
-			return _authorizationHeaderParameters;
-		}
+		get => _authorizationHeaderParameters ??= new NameValueCollection();
 		set => _authorizationHeaderParameters = value;
 	}
 
@@ -275,11 +255,12 @@ public class OAuthContext : IOAuthContext
 
 	public string GenerateUrl()
 	{
-		var builder = new UriBuilder(NormalizedRequestUrl);
+		var builder = new UriBuilder(NormalizedRequestUrl)
+		{
+			Query = ""
+		};
 
-		builder.Query = "";
-
-		return builder.Uri + "?" + UriUtility.FormatQueryString(QueryParameters);
+		return $"{builder.Uri}?{UriUtility.FormatQueryString(QueryParameters)}";
 	}
 
 	public string GenerateOAuthParametersForHeader()
@@ -325,7 +306,7 @@ public class OAuthContext : IOAuthContext
 
 	public string GenerateBodyHash()
 	{
-		var hash = SHA1.Create().ComputeHash((RawContent ?? new byte[0]));
+		var hash = SHA1.Create().ComputeHash((RawContent ?? Array.Empty<byte>()));
 		return Convert.ToBase64String(hash);
 	}
 

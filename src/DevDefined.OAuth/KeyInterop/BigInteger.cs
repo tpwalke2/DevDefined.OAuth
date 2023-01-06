@@ -487,9 +487,10 @@ public class BigInteger
 
 	public static BigInteger operator +(BigInteger bi1, BigInteger bi2)
 	{
-		var result = new BigInteger();
-
-		result.dataLength = (bi1.dataLength > bi2.dataLength) ? bi1.dataLength : bi2.dataLength;
+		var result = new BigInteger
+		{
+			dataLength = (bi1.dataLength > bi2.dataLength) ? bi1.dataLength : bi2.dataLength
+		};
 
 		long carry = 0;
 		for (var i = 0; i < result.dataLength; i++)
@@ -569,9 +570,10 @@ public class BigInteger
 
 	public static BigInteger operator -(BigInteger bi1, BigInteger bi2)
 	{
-		var result = new BigInteger();
-
-		result.dataLength = (bi1.dataLength > bi2.dataLength) ? bi1.dataLength : bi2.dataLength;
+		var result = new BigInteger
+		{
+			dataLength = (bi1.dataLength > bi2.dataLength) ? bi1.dataLength : bi2.dataLength
+		};
 
 		long carryIn = 0;
 		for (var i = 0; i < result.dataLength; i++)
@@ -1615,9 +1617,14 @@ public class BigInteger
 		r1 -= r2;
 		if ((r1.data[maxLength - 1] & 0x80000000) != 0) // negative
 		{
-			var val = new BigInteger();
-			val.data[kPlusOne] = 0x00000001;
-			val.dataLength = kPlusOne + 1;
+			var val = new BigInteger
+			{
+				data =
+				{
+					[kPlusOne] = 0x00000001
+				},
+				dataLength = kPlusOne + 1
+			};
 			r1 += val;
 		}
 
