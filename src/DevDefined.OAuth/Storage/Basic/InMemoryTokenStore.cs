@@ -37,10 +37,8 @@ public class SimpleTokenStore : ITokenStore
 
 	public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
 	{
-		if (accessTokenRepository == null) throw new ArgumentNullException(nameof(accessTokenRepository));
-		if (requestTokenRepository == null) throw new ArgumentNullException(nameof(requestTokenRepository));
-		_accessTokenRepository = accessTokenRepository;
-		_requestTokenRepository = requestTokenRepository;
+		_accessTokenRepository = accessTokenRepository ?? throw new ArgumentNullException(nameof(accessTokenRepository));
+		_requestTokenRepository = requestTokenRepository ?? throw new ArgumentNullException(nameof(requestTokenRepository));
 	}
 
 	public IToken CreateRequestToken(IOAuthContext context)

@@ -36,8 +36,7 @@ public class ConsumerValidationInspector : IContextInspector
 
 	public ConsumerValidationInspector(IConsumerStore consumerStore)
 	{
-		if (consumerStore == null) throw new ArgumentNullException(nameof(consumerStore));
-		_consumerStore = consumerStore;
+		_consumerStore = consumerStore ?? throw new ArgumentNullException(nameof(consumerStore));
 	}
 
 	public void InspectContext(ProviderPhase phase, IOAuthContext context)

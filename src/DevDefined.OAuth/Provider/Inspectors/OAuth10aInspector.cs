@@ -39,8 +39,7 @@ public class OAuth10AInspector : IContextInspector
 
 	public OAuth10AInspector(ITokenStore tokenStore)
 	{
-		if (tokenStore == null) throw new ArgumentNullException(nameof(tokenStore));
-		_tokenStore = tokenStore;
+		_tokenStore = tokenStore ?? throw new ArgumentNullException(nameof(tokenStore));
 	}
 
 	public void InspectContext(ProviderPhase phase, IOAuthContext context)

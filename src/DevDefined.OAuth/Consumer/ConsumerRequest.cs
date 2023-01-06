@@ -43,10 +43,8 @@ public class ConsumerRequest : IConsumerRequest
 
 	public ConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
 	{
-		if (context == null) throw new ArgumentNullException(nameof(context));
-		if (consumerContext == null) throw new ArgumentNullException(nameof(consumerContext));
-		_context = context;
-		_consumerContext = consumerContext;
+		_context = context ?? throw new ArgumentNullException(nameof(context));
+		_consumerContext = consumerContext ?? throw new ArgumentNullException(nameof(consumerContext));
 		_token = token;
 	}
 

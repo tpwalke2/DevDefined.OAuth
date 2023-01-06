@@ -36,8 +36,7 @@ public class NonceStoreInspector : IContextInspector
 
 	public NonceStoreInspector(INonceStore nonceStore)
 	{
-		if (nonceStore == null) throw new ArgumentNullException(nameof(nonceStore));
-		_nonceStore = nonceStore;
+		_nonceStore = nonceStore ?? throw new ArgumentNullException(nameof(nonceStore));
 	}
 
 	public void InspectContext(ProviderPhase phase, IOAuthContext context)
