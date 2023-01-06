@@ -62,7 +62,7 @@ public static class ConsumerRequestExtensions
 
 	static void ApplyParameters(NameValueCollection destination, IDictionary additions)
 	{
-		if (additions == null) throw new ArgumentNullException("additions");
+		if (additions == null) throw new ArgumentNullException(nameof(additions));
 
 		foreach (string parameter in additions.Keys)
 		{

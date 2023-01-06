@@ -53,7 +53,7 @@ public class OAuthContextBuilder : IOAuthContextBuilder
 
 	public virtual IOAuthContext FromUrl(string httpMethod, string url)
 	{
-		if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("url");
+		if (string.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url));
 
 		Uri uri;
 
@@ -69,8 +69,8 @@ public class OAuthContextBuilder : IOAuthContextBuilder
 	{
 		uri = CleanUri(uri);
 
-		if (httpMethod == null) throw new ArgumentNullException("httpMethod");
-		if (uri == null) throw new ArgumentNullException("uri");
+		if (httpMethod == null) throw new ArgumentNullException(nameof(httpMethod));
+		if (uri == null) throw new ArgumentNullException(nameof(uri));
 
 		return new OAuthContext
 		{

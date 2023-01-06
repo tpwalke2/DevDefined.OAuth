@@ -67,12 +67,12 @@ public class HmacSha1SignatureImplementation : IContextSignatureImplementation
 	{
 		if (hashAlgorithm == null)
 		{
-			throw new ArgumentNullException("hashAlgorithm");
+			throw new ArgumentNullException(nameof(hashAlgorithm));
 		}
 
 		if (string.IsNullOrEmpty(data))
 		{
-			throw new ArgumentNullException("data");
+			throw new ArgumentNullException(nameof(data));
 		}
 
 		var dataBuffer = Encoding.ASCII.GetBytes(data);

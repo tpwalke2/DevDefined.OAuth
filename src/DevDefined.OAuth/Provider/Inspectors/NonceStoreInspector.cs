@@ -36,7 +36,7 @@ public class NonceStoreInspector : IContextInspector
 
 	public NonceStoreInspector(INonceStore nonceStore)
 	{
-		if (nonceStore == null) throw new ArgumentNullException("nonceStore");
+		if (nonceStore == null) throw new ArgumentNullException(nameof(nonceStore));
 		_nonceStore = nonceStore;
 	}
 

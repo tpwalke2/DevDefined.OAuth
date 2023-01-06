@@ -37,15 +37,15 @@ public class SimpleTokenStore : ITokenStore
 
 	public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
 	{
-		if (accessTokenRepository == null) throw new ArgumentNullException("accessTokenRepository");
-		if (requestTokenRepository == null) throw new ArgumentNullException("requestTokenRepository");
+		if (accessTokenRepository == null) throw new ArgumentNullException(nameof(accessTokenRepository));
+		if (requestTokenRepository == null) throw new ArgumentNullException(nameof(requestTokenRepository));
 		_accessTokenRepository = accessTokenRepository;
 		_requestTokenRepository = requestTokenRepository;
 	}
 
 	public IToken CreateRequestToken(IOAuthContext context)
 	{
-		if (context == null) throw new ArgumentNullException("context");
+		if (context == null) throw new ArgumentNullException(nameof(context));
 
 		var token = new RequestToken
 		{
@@ -70,7 +70,7 @@ public class SimpleTokenStore : ITokenStore
 	{
 		if (context == null)
 		{
-			throw new ArgumentNullException("context");
+			throw new ArgumentNullException(nameof(context));
 		}
 
 		var accessToken = new AccessToken
@@ -90,7 +90,7 @@ public class SimpleTokenStore : ITokenStore
 
 	public void ConsumeRequestToken(IOAuthContext requestContext)
 	{
-		if (requestContext == null) throw new ArgumentNullException("requestContext");
+		if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
 
 		var requestToken = GetRequestToken(requestContext);
 

@@ -127,7 +127,7 @@ public class TestTokenStore : ITokenStore
 
 	static void EnsureTestConsumer(IConsumer consumer)
 	{
-		if (consumer == null) throw new ArgumentNullException("consumer");
+		if (consumer == null) throw new ArgumentNullException(nameof(consumer));
 		if (consumer.Realm != null)
 			throw new OAuthException(consumer as OAuthContext, OAuthProblems.ConsumerKeyRejected,
 				"supplied realm was unknown to the provider");

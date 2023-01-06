@@ -53,7 +53,7 @@ public class DisposableAction : IDisposable
 
 	public DisposableAction(Action action)
 	{
-		if (action == null) throw new ArgumentNullException("action");
+		if (action == null) throw new ArgumentNullException(nameof(action));
 		_action = action;
 	}
 

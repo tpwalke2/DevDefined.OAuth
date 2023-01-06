@@ -34,7 +34,7 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 	{
 		if (target == null)
 		{
-			throw new ArgumentNullException("target");
+			throw new ArgumentNullException(nameof(target));
 		}
 
 		var targetType = target.GetType();

@@ -41,7 +41,7 @@ public class OAuthProvider : IOAuthProvider
     {
         RequiresCallbackUrlInRequest = true;
 
-        if (tokenStore == null) throw new ArgumentNullException("tokenStore");
+        if (tokenStore == null) throw new ArgumentNullException(nameof(tokenStore));
         _tokenStore = tokenStore;
 
         if (inspectors != null) _inspectors.AddRange(inspectors);

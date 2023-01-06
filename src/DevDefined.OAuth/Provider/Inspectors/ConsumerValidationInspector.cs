@@ -36,7 +36,7 @@ public class ConsumerValidationInspector : IContextInspector
 
 	public ConsumerValidationInspector(IConsumerStore consumerStore)
 	{
-		if (consumerStore == null) throw new ArgumentNullException("consumerStore");
+		if (consumerStore == null) throw new ArgumentNullException(nameof(consumerStore));
 		_consumerStore = consumerStore;
 	}
 

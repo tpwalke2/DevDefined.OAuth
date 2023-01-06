@@ -39,7 +39,7 @@ public class OAuth10AInspector : IContextInspector
 
 	public OAuth10AInspector(ITokenStore tokenStore)
 	{
-		if (tokenStore == null) throw new ArgumentNullException("tokenStore");
+		if (tokenStore == null) throw new ArgumentNullException(nameof(tokenStore));
 		_tokenStore = tokenStore;
 	}
 

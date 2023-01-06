@@ -35,8 +35,8 @@ public class DefaultConsumerRequestFactory : IConsumerRequestFactory
 
 	public IConsumerRequest CreateConsumerRequest(IOAuthContext context, IOAuthConsumerContext consumerContext, IToken token)
 	{
-		if (context == null) throw new ArgumentNullException("context");
-		if (consumerContext == null) throw new ArgumentNullException("consumerContext");
+		if (context == null) throw new ArgumentNullException(nameof(context));
+		if (consumerContext == null) throw new ArgumentNullException(nameof(consumerContext));
 
 		return new ConsumerRequest(context, consumerContext, token);
 	}
