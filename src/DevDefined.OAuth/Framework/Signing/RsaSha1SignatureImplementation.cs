@@ -33,10 +33,7 @@ namespace DevDefined.OAuth.Framework.Signing;
 
 public class RsaSha1SignatureImplementation : IContextSignatureImplementation
 {
-	public string MethodName
-	{
-		get { return SignatureMethod.RsaSha1; }
-	}
+	public string MethodName => SignatureMethod.RsaSha1;
 
 	public void SignContext(IOAuthContext authContext, SigningContext signingContext)
 	{

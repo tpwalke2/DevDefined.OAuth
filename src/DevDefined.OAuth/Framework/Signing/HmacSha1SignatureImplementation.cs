@@ -33,10 +33,7 @@ namespace DevDefined.OAuth.Framework.Signing;
 
 public class HmacSha1SignatureImplementation : IContextSignatureImplementation
 {
-	public string MethodName
-	{
-		get { return SignatureMethod.HmacSha1; }
-	}
+	public string MethodName => SignatureMethod.HmacSha1;
 
 	public void SignContext(IOAuthContext authContext, SigningContext signingContext)
 	{

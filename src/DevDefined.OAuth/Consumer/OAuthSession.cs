@@ -81,7 +81,7 @@ public class OAuthSession : IOAuthSession
 
 	public IConsumerRequestFactory ConsumerRequestFactory
 	{
-		get { return _consumerRequestFactory; }
+		get => _consumerRequestFactory;
 		set
 		{
 			if (_consumerRequestFactory == null) throw new ArgumentNullException(nameof(value));

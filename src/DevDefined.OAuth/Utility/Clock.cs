@@ -38,15 +38,9 @@ public static class Clock
 		_nowFunc = () => DateTime.Now;
 	}
 
-	public static string EpochString
-	{
-		get { return Now.Epoch().ToString(); }
-	}
+	public static string EpochString => Now.Epoch().ToString();
 
-	public static DateTime Now
-	{
-		get { return _nowFunc(); }
-	}
+	public static DateTime Now => _nowFunc();
 
 	public static IDisposable FreezeAt(DateTime time)
 	{

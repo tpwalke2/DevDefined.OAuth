@@ -30,10 +30,7 @@ namespace DevDefined.OAuth.Framework.Signing;
 
 public class PlainTextSignatureImplementation : IContextSignatureImplementation
 {
-	public string MethodName
-	{
-		get { return SignatureMethod.PlainText; }
-	}
+	public string MethodName => SignatureMethod.PlainText;
 
 	public void SignContext(IOAuthContext authContext, SigningContext signingContext)
 	{

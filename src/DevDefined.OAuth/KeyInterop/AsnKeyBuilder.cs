@@ -121,8 +121,7 @@ internal class AsnKeyBuilder
                 { return EMPTY; }
                 return m_octets;
             }
-            set
-            { m_octets = value; }
+            set => m_octets = value;
         }
 
         // Methods

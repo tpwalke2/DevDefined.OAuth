@@ -74,7 +74,7 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 			_properties.TryGetValue(key.ToString(), out value);
 			return value;
 		}
-		set { throw new NotImplementedException(); }
+		set => throw new NotImplementedException();
 	}
 
 	/// <summary>
@@ -127,40 +127,28 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 	/// </summary>
 	/// <value></value>
 	/// <returns>An <see cref="T:System.Collections.ICollection"/> object containing the keys of the <see cref="T:System.Collections.IDictionary"/> object.</returns>
-	public ICollection Keys
-	{
-		get { return _properties.Keys; }
-	}
+	public ICollection Keys => _properties.Keys;
 
 	/// <summary>
 	/// Gets an <see cref="T:System.Collections.ICollection"/> object containing the values in the <see cref="T:System.Collections.IDictionary"/> object.
 	/// </summary>
 	/// <value></value>
 	/// <returns>An <see cref="T:System.Collections.ICollection"/> object containing the values in the <see cref="T:System.Collections.IDictionary"/> object.</returns>
-	public ICollection Values
-	{
-		get { return _properties.Values; }
-	}
+	public ICollection Values => _properties.Values;
 
 	/// <summary>
 	/// Gets a value indicating whether the <see cref="T:System.Collections.IDictionary"/> object is read-only.
 	/// </summary>
 	/// <value></value>
 	/// <returns>true if the <see cref="T:System.Collections.IDictionary"/> object is read-only; otherwise, false.</returns>
-	public bool IsReadOnly
-	{
-		get { return true; }
-	}
+	public bool IsReadOnly => true;
 
 	/// <summary>
 	/// Gets a value indicating whether the <see cref="T:System.Collections.IDictionary"/> object has a fixed size.
 	/// </summary>
 	/// <value></value>
 	/// <returns>true if the <see cref="T:System.Collections.IDictionary"/> object has a fixed size; otherwise, false.</returns>
-	public bool IsFixedSize
-	{
-		get { throw new NotImplementedException(); }
-	}
+	public bool IsFixedSize => throw new NotImplementedException();
 
 	/// <summary>
 	/// Copies the elements of the <see cref="T:System.Collections.ICollection"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
@@ -184,30 +172,21 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 	/// </summary>
 	/// <value></value>
 	/// <returns>The number of elements contained in the <see cref="T:System.Collections.ICollection"/>.</returns>
-	public int Count
-	{
-		get { return _properties.Count; }
-	}
+	public int Count => _properties.Count;
 
 	/// <summary>
 	/// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection"/>.
 	/// </summary>
 	/// <value></value>
 	/// <returns>An object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection"/>.</returns>
-	public object SyncRoot
-	{
-		get { return _properties; }
-	}
+	public object SyncRoot => _properties;
 
 	/// <summary>
 	/// Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection"/> is synchronized (thread safe).
 	/// </summary>
 	/// <value></value>
 	/// <returns>true if access to the <see cref="T:System.Collections.ICollection"/> is synchronized (thread safe); otherwise, false.</returns>
-	public bool IsSynchronized
-	{
-		get { return false; }
-	}
+	public bool IsSynchronized => false;
 
 	/// <summary>
 	/// Returns an enumerator that iterates through a collection.
@@ -232,20 +211,11 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 			_enumerator = enumerator;
 		}
 
-		public object Key
-		{
-			get { return _current.Key; }
-		}
+		public object Key => _current.Key;
 
-		public object Value
-		{
-			get { return _current.Value; }
-		}
+		public object Value => _current.Value;
 
-		public DictionaryEntry Entry
-		{
-			get { return new DictionaryEntry(Key, Value); }
-		}
+		public DictionaryEntry Entry => new DictionaryEntry(Key, Value);
 
 		public bool MoveNext()
 		{
@@ -264,10 +234,7 @@ public class ReflectionBasedDictionaryAdapter : IDictionary
 			_enumerator.Reset();
 		}
 
-		public object Current
-		{
-			get { return new DictionaryEntry(Key, Value); }
-		}
+		public object Current => new DictionaryEntry(Key, Value);
 	}
 
 	#endregion

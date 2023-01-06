@@ -45,14 +45,14 @@ public class OAuthConsumerContext : IOAuthConsumerContext
 
 	public IOAuthContextSigner Signer
 	{
-		get { return _signer; }
-		set { _signer = value; }
+		get => _signer;
+		set => _signer = value;
 	}
 
 	public INonceGenerator NonceGenerator
 	{
-		get { return _nonceGenerator; }
-		set { _nonceGenerator = value; }
+		get => _nonceGenerator;
+		set => _nonceGenerator = value;
 	}
 
 	public string Realm { get; set; }

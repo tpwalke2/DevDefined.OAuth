@@ -92,7 +92,7 @@ public class OAuthContext : IOAuthContext
 			if (_headers == null) _headers = new NameValueCollection();
 			return _headers;
 		}
-		set { _headers = value; }
+		set => _headers = value;
 	}
 
 	public NameValueCollection QueryParameters
@@ -102,7 +102,7 @@ public class OAuthContext : IOAuthContext
 			if (_queryParameters == null) _queryParameters = new NameValueCollection();
 			return _queryParameters;
 		}
-		set { _queryParameters = value; }
+		set => _queryParameters = value;
 	}
 
 	public NameValueCollection Cookies
@@ -112,7 +112,7 @@ public class OAuthContext : IOAuthContext
 			if (_cookies == null) _cookies = new NameValueCollection();
 			return _cookies;
 		}
-		set { _cookies = value; }
+		set => _cookies = value;
 	}
 
 	public NameValueCollection FormEncodedParameters
@@ -122,7 +122,7 @@ public class OAuthContext : IOAuthContext
 			if (_formEncodedParameters == null) _formEncodedParameters = new NameValueCollection();
 			return _formEncodedParameters;
 		}
-		set { _formEncodedParameters = value; }
+		set => _formEncodedParameters = value;
 	}
 
 	public NameValueCollection AuthorizationHeaderParameters
@@ -132,7 +132,7 @@ public class OAuthContext : IOAuthContext
 			if (_authorizationHeaderParameters == null) _authorizationHeaderParameters = new NameValueCollection();
 			return _authorizationHeaderParameters;
 		}
-		set { _authorizationHeaderParameters = value; }
+		set => _authorizationHeaderParameters = value;
 	}
 
 	public byte[] RawContent { get; set; }
@@ -140,7 +140,7 @@ public class OAuthContext : IOAuthContext
 
 	public Uri RawUri
 	{
-		get { return _rawUri; }
+		get => _rawUri;
 		set
 		{
 			_rawUri = value;
@@ -166,100 +166,100 @@ public class OAuthContext : IOAuthContext
 
 	public string Nonce
 	{
-		get { return _nonce.Value; }
-		set { _nonce.Value = value; }
+		get => _nonce.Value;
+		set => _nonce.Value = value;
 	}
 
 	public string Verifier
 	{
-		get { return _verifier.Value; }
-		set { _verifier.Value = value; }
+		get => _verifier.Value;
+		set => _verifier.Value = value;
 	}
 
 	public string SessionHandle
 	{
-		get { return _sessionHandle.Value; }
-		set { _sessionHandle.Value = value; }
+		get => _sessionHandle.Value;
+		set => _sessionHandle.Value = value;
 	}
 
 	public string CallbackUrl
 	{
-		get { return _callbackUrl.Value; }
-		set { _callbackUrl.Value = value; }
+		get => _callbackUrl.Value;
+		set => _callbackUrl.Value = value;
 	}
 
 	public string Signature
 	{
-		get { return _signature.Value; }
-		set { _signature.Value = value; }
+		get => _signature.Value;
+		set => _signature.Value = value;
 	}
 
 	public string SignatureMethod
 	{
-		get { return _signatureMethod.Value; }
-		set { _signatureMethod.Value = value; }
+		get => _signatureMethod.Value;
+		set => _signatureMethod.Value = value;
 	}
 
 	public string Timestamp
 	{
-		get { return _timestamp.Value; }
-		set { _timestamp.Value = value; }
+		get => _timestamp.Value;
+		set => _timestamp.Value = value;
 	}
 
 	public string BodyHash
 	{
-		get { return _bodyHash.Value; }
-		set { _bodyHash.Value = value; }
+		get => _bodyHash.Value;
+		set => _bodyHash.Value = value;
 	}
 
 	public string Version
 	{
-		get { return _version.Value; }
-		set { _version.Value = value; }
+		get => _version.Value;
+		set => _version.Value = value;
 	}
 
 	public bool UseAuthorizationHeader { get; set; }
 
 	public string Realm
 	{
-		get { return AuthorizationHeaderParameters[Parameters.Realm]; }
-		set { AuthorizationHeaderParameters[Parameters.Realm] = value; }
+		get => AuthorizationHeaderParameters[Parameters.Realm];
+		set => AuthorizationHeaderParameters[Parameters.Realm] = value;
 	}
 
 	public string ConsumerKey
 	{
-		get { return _consumerKey.Value; }
-		set { _consumerKey.Value = value; }
+		get => _consumerKey.Value;
+		set => _consumerKey.Value = value;
 	}
 
 	public string Token
 	{
-		get { return _token.Value; }
-		set { _token.Value = value; }
+		get => _token.Value;
+		set => _token.Value = value;
 	}
 
 	public string TokenSecret
 	{
-		get { return _tokenSecret.Value; }
-		set { _tokenSecret.Value = value; }
+		get => _tokenSecret.Value;
+		set => _tokenSecret.Value = value;
 	}
 
 	public string XAuthMode
 	{
-		get { return _xAuthMode.Value; }
-		set { _xAuthMode.Value = value; }
+		get => _xAuthMode.Value;
+		set => _xAuthMode.Value = value;
 	}
 
 	public string XAuthUsername
 	{
-		get { return _xAuthUsername.Value; }
-		set { _xAuthUsername.Value = value; }
+		get => _xAuthUsername.Value;
+		set => _xAuthUsername.Value = value;
 	}
 
 	public string XAuthPassword
 	{
-		get { return _xAuthPassword.Value; }
-		set { _xAuthPassword.Value = value; }
+		get => _xAuthPassword.Value;
+		set => _xAuthPassword.Value = value;
 	}
 
 	public Uri GenerateUri()

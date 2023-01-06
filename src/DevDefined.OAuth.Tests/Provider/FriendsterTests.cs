@@ -54,10 +54,7 @@ A1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADQQCXFtEZswNcPcOTT78oeTuslgmu
 0shaZB0PAjA3I89OJZBI7SknIwDxj56kNZpEo6Rhf3uilpj44gkJFecSYnG2
 -----END CERTIFICATE-----";
 
-	public static X509Certificate2 FriendsterCertificate
-	{
-		get { return new X509Certificate2(Encoding.ASCII.GetBytes(_friendsterCertificate)); }
-	}
+	public static X509Certificate2 FriendsterCertificate => new X509Certificate2(Encoding.ASCII.GetBytes(_friendsterCertificate));
 
 	[Fact]
 	public void EnsureSignaturesMatchWithAndWithoutTrailingAmpersand_ForUrl()
