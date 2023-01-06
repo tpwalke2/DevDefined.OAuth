@@ -24,12 +24,11 @@
 
 #endregion
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+public interface IToken : IConsumer
 {
-	public interface IToken : IConsumer
-	{
-		string TokenSecret { get; set; }
-		string Token { get; set; }
-		string SessionHandle { get; set; }
-	}
+	string TokenSecret { get; set; }
+	string Token { get; set; }
+	string SessionHandle { get; set; }
 }

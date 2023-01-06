@@ -26,14 +26,13 @@
 
 using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth
+namespace DevDefined.OAuth;
+
+/// <summary>
+/// Generates a nonce, which should be unique for the selected consumer (i.e. never generated
+/// by subsequent calls to <see cref="GenerateNonce" />)
+/// </summary>
+public interface INonceGenerator
 {
-	/// <summary>
-	/// Generates a nonce, which should be unique for the selected consumer (i.e. never generated
-	/// by subsequent calls to <see cref="GenerateNonce" />)
-	/// </summary>
-	public interface INonceGenerator
-	{
-		string GenerateNonce(IOAuthContext context);
-	}
+	string GenerateNonce(IOAuthContext context);
 }

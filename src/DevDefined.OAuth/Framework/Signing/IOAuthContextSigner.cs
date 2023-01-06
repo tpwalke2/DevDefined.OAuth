@@ -24,11 +24,10 @@
 
 #endregion
 
-namespace DevDefined.OAuth.Framework.Signing
+namespace DevDefined.OAuth.Framework.Signing;
+
+public interface IOAuthContextSigner
 {
-	public interface IOAuthContextSigner
-	{
-		void SignContext(IOAuthContext authContext, SigningContext signingContext);
-		bool ValidateSignature(IOAuthContext authContext, SigningContext signingContext);
-	}
+	void SignContext(IOAuthContext authContext, SigningContext signingContext);
+	bool ValidateSignature(IOAuthContext authContext, SigningContext signingContext);
 }

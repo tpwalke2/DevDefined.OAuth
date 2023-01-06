@@ -28,190 +28,189 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Utility;
 
-namespace DevDefined.OAuth.Storage.Basic
+namespace DevDefined.OAuth.Storage.Basic;
+
+public class SimpleTokenStore : ITokenStore
 {
-	public class SimpleTokenStore : ITokenStore
+	readonly ITokenRepository<AccessToken> _accessTokenRepository;
+	readonly ITokenRepository<RequestToken> _requestTokenRepository;
+
+	public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
 	{
-		readonly ITokenRepository<AccessToken> _accessTokenRepository;
-		readonly ITokenRepository<RequestToken> _requestTokenRepository;
+		if (accessTokenRepository == null) throw new ArgumentNullException("accessTokenRepository");
+		if (requestTokenRepository == null) throw new ArgumentNullException("requestTokenRepository");
+		_accessTokenRepository = accessTokenRepository;
+		_requestTokenRepository = requestTokenRepository;
+	}
 
-		public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
+	public IToken CreateRequestToken(IOAuthContext context)
+	{
+		if (context == null) throw new ArgumentNullException("context");
+
+		var token = new RequestToken
 		{
-			if (accessTokenRepository == null) throw new ArgumentNullException("accessTokenRepository");
-			if (requestTokenRepository == null) throw new ArgumentNullException("requestTokenRepository");
-			_accessTokenRepository = accessTokenRepository;
-			_requestTokenRepository = requestTokenRepository;
+			ConsumerKey = context.ConsumerKey,
+			Realm = context.Realm,
+			Token = Guid.NewGuid().ToString(),
+			TokenSecret = Guid.NewGuid().ToString(),
+			CallbackUrl = context.CallbackUrl
+		};
+
+		_requestTokenRepository.SaveToken(token);
+
+		return token;
+	}
+
+	/// <summary>
+	/// Create an access token using xAuth.
+	/// </summary>
+	/// <param name="context">The context.</param>
+	/// <returns></returns>
+	public IToken CreateAccessToken(IOAuthContext context)
+	{
+		if (context == null)
+		{
+			throw new ArgumentNullException("context");
 		}
 
-		public IToken CreateRequestToken(IOAuthContext context)
+		var accessToken = new AccessToken
 		{
-			if (context == null) throw new ArgumentNullException("context");
+			ConsumerKey = context.ConsumerKey,
+			ExpiryDate = DateTime.UtcNow.AddDays(20),
+			Realm = context.Realm,
+			Token = Guid.NewGuid().ToString(),
+			TokenSecret = Guid.NewGuid().ToString(),
+			UserName = Guid.NewGuid().ToString(),
+		};
 
-			var token = new RequestToken
-			            	{
-			            		ConsumerKey = context.ConsumerKey,
-			            		Realm = context.Realm,
-			            		Token = Guid.NewGuid().ToString(),
-			            		TokenSecret = Guid.NewGuid().ToString(),
-			            		CallbackUrl = context.CallbackUrl
-			            	};
+		_accessTokenRepository.SaveToken(accessToken);
 
-			_requestTokenRepository.SaveToken(token);
+		return accessToken;
+	}
 
-			return token;
-		}
+	public void ConsumeRequestToken(IOAuthContext requestContext)
+	{
+		if (requestContext == null) throw new ArgumentNullException("requestContext");
 
-    /// <summary>
-    /// Create an access token using xAuth.
-    /// </summary>
-    /// <param name="context">The context.</param>
-    /// <returns></returns>
-    public IToken CreateAccessToken(IOAuthContext context)
-    {
-      if (context == null)
-      {
-        throw new ArgumentNullException("context");
-      }
+		var requestToken = GetRequestToken(requestContext);
 
-      var accessToken = new AccessToken
-        {
-          ConsumerKey = context.ConsumerKey,
-          ExpiryDate = DateTime.UtcNow.AddDays(20),
-          Realm = context.Realm,
-          Token = Guid.NewGuid().ToString(),
-          TokenSecret = Guid.NewGuid().ToString(),
-          UserName = Guid.NewGuid().ToString(),
-        };
+		UseUpRequestToken(requestContext, requestToken);
 
-      _accessTokenRepository.SaveToken(accessToken);
+		_requestTokenRepository.SaveToken(requestToken);
+	}
 
-      return accessToken;
-    }
+	public void ConsumeAccessToken(IOAuthContext accessContext)
+	{
+		var accessToken = GetAccessToken(accessContext);
 
-		public void ConsumeRequestToken(IOAuthContext requestContext)
+		if (accessToken.ExpiryDate < Clock.Now)
 		{
-			if (requestContext == null) throw new ArgumentNullException("requestContext");
-
-			var requestToken = GetRequestToken(requestContext);
-
-			UseUpRequestToken(requestContext, requestToken);
-
-			_requestTokenRepository.SaveToken(requestToken);
+			throw new OAuthException(accessContext, OAuthProblems.TokenExpired, "Token has expired");
 		}
+	}
 
-		public void ConsumeAccessToken(IOAuthContext accessContext)
+	public IToken GetAccessTokenAssociatedWithRequestToken(IOAuthContext requestContext)
+	{
+		var requestToken = GetRequestToken(requestContext);
+		return requestToken.AccessToken;
+	}
+
+	public RequestForAccessStatus GetStatusOfRequestForAccess(IOAuthContext accessContext)
+	{
+		var request = GetRequestToken(accessContext);
+
+		if (request.AccessDenied) return RequestForAccessStatus.Denied;
+
+		if (request.AccessToken == null) return RequestForAccessStatus.Unknown;
+
+		return RequestForAccessStatus.Granted;
+	}
+
+	public string GetCallbackUrlForToken(IOAuthContext requestContext)
+	{
+		var requestToken = GetRequestToken(requestContext);
+		return requestToken.CallbackUrl;
+	}
+
+	public string GetVerificationCodeForRequestToken(IOAuthContext requestContext)
+	{
+		var requestToken = GetRequestToken(requestContext);
+
+		return requestToken.Verifier;
+	}
+
+	public string GetRequestTokenSecret(IOAuthContext context)
+	{
+		var requestToken = GetRequestToken(context);
+
+		return requestToken.TokenSecret;
+	}
+
+	public string GetAccessTokenSecret(IOAuthContext context)
+	{
+		var token = GetAccessToken(context);
+
+		return token.TokenSecret;
+	}
+
+	public IToken RenewAccessToken(IOAuthContext requestContext)
+	{
+		throw new NotImplementedException();
+	}
+
+	RequestToken GetRequestToken(IOAuthContext context)
+	{
+		try
 		{
-			var accessToken = GetAccessToken(accessContext);
-
-			if (accessToken.ExpiryDate < Clock.Now)
-			{
-				throw new OAuthException(accessContext, OAuthProblems.TokenExpired, "Token has expired");
-			}
+			return _requestTokenRepository.GetToken(context.Token);
 		}
-
-		public IToken GetAccessTokenAssociatedWithRequestToken(IOAuthContext requestContext)
+		catch (Exception exception)
 		{
-			var requestToken = GetRequestToken(requestContext);
-			return requestToken.AccessToken;
+			// TODO: log exception
+			throw Error.UnknownToken(context, context.Token, exception);
 		}
+	}
 
-		public RequestForAccessStatus GetStatusOfRequestForAccess(IOAuthContext accessContext)
+	AccessToken GetAccessToken(IOAuthContext context)
+	{
+		try
 		{
-			var request = GetRequestToken(accessContext);
-
-			if (request.AccessDenied) return RequestForAccessStatus.Denied;
-
-			if (request.AccessToken == null) return RequestForAccessStatus.Unknown;
-
-			return RequestForAccessStatus.Granted;
+			return _accessTokenRepository.GetToken(context.Token);
 		}
-
-		public string GetCallbackUrlForToken(IOAuthContext requestContext)
+		catch (Exception exception)
 		{
-			var requestToken = GetRequestToken(requestContext);
-			return requestToken.CallbackUrl;
+			// TODO: log exception
+			throw Error.UnknownToken(context, context.Token, exception);
 		}
+	}
 
-		public string GetVerificationCodeForRequestToken(IOAuthContext requestContext)
-		{
-			var requestToken = GetRequestToken(requestContext);
-
-			return requestToken.Verifier;
-		}
-
-		public string GetRequestTokenSecret(IOAuthContext context)
-		{
-			var requestToken = GetRequestToken(context);
-
-			return requestToken.TokenSecret;
-		}
-
-		public string GetAccessTokenSecret(IOAuthContext context)
-		{
-			var token = GetAccessToken(context);
-
-			return token.TokenSecret;
-		}
-
-		public IToken RenewAccessToken(IOAuthContext requestContext)
-		{
-			throw new NotImplementedException();
-		}
-
-		RequestToken GetRequestToken(IOAuthContext context)
+	public IToken GetToken(IOAuthContext context)
+	{
+		var token = (IToken) null;
+		if (!string.IsNullOrEmpty(context.Token))
 		{
 			try
 			{
-				return _requestTokenRepository.GetToken(context.Token);
+				token = _accessTokenRepository.GetToken(context.Token) ??
+				        (IToken) _requestTokenRepository.GetToken(context.Token);
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
 				// TODO: log exception
-				throw Error.UnknownToken(context, context.Token, exception);
+				throw Error.UnknownToken(context, context.Token, ex);
 			}
 		}
+		return token;
+	}
 
-		AccessToken GetAccessToken(IOAuthContext context)
+	static void UseUpRequestToken(IOAuthContext requestContext, RequestToken requestToken)
+	{
+		if (requestToken.UsedUp)
 		{
-			try
-			{
-				return _accessTokenRepository.GetToken(context.Token);
-			}
-			catch (Exception exception)
-			{
-				// TODO: log exception
-				throw Error.UnknownToken(context, context.Token, exception);
-			}
+			throw new OAuthException(requestContext, OAuthProblems.TokenRejected,
+				"The request token has already be consumed.");
 		}
 
-		public IToken GetToken(IOAuthContext context)
-		{
-			var token = (IToken) null;
-			if (!string.IsNullOrEmpty(context.Token))
-			{
-				try
-				{
-					token = _accessTokenRepository.GetToken(context.Token) ??
-					        (IToken) _requestTokenRepository.GetToken(context.Token);
-				}
-				catch (Exception ex)
-				{
-					// TODO: log exception
-					throw Error.UnknownToken(context, context.Token, ex);
-				}
-			}
-			return token;
-		}
-
-	  static void UseUpRequestToken(IOAuthContext requestContext, RequestToken requestToken)
-		{
-			if (requestToken.UsedUp)
-			{
-				throw new OAuthException(requestContext, OAuthProblems.TokenRejected,
-				                         "The request token has already be consumed.");
-			}
-
-			requestToken.UsedUp = true;
-		}
+		requestToken.UsedUp = true;
 	}
 }

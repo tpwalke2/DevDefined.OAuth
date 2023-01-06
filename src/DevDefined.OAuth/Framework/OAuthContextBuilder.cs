@@ -34,195 +34,194 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace DevDefined.OAuth.Framework
+namespace DevDefined.OAuth.Framework;
+
+public class OAuthContextBuilder : IOAuthContextBuilder
 {
-	public class OAuthContextBuilder : IOAuthContextBuilder
+	readonly Func<Uri, Uri> _uriAdjuster;
+	readonly Func<Uri, Uri> _emptyUriAdjuster = (uri) => uri;
+
+	public OAuthContextBuilder(Func<Uri, Uri> uriAdjuster)
 	{
-		readonly Func<Uri, Uri> _uriAdjuster;
-		readonly Func<Uri, Uri> _emptyUriAdjuster = (uri) => uri;
+		_uriAdjuster = uriAdjuster ?? _emptyUriAdjuster;
+	}
 
-		public OAuthContextBuilder(Func<Uri, Uri> uriAdjuster)
+	public OAuthContextBuilder()
+		: this(null)
+	{
+	}
+
+	public virtual IOAuthContext FromUrl(string httpMethod, string url)
+	{
+		if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("url");
+
+		Uri uri;
+
+		if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
 		{
-			_uriAdjuster = uriAdjuster ?? _emptyUriAdjuster;
+			throw new ArgumentException($"Failed to parse url: {url} into a valid Uri instance");
 		}
 
-		public OAuthContextBuilder()
-			: this(null)
+		return FromUri(httpMethod, uri);
+	}
+
+	public virtual IOAuthContext FromUri(string httpMethod, Uri uri)
+	{
+		uri = CleanUri(uri);
+
+		if (httpMethod == null) throw new ArgumentNullException("httpMethod");
+		if (uri == null) throw new ArgumentNullException("uri");
+
+		return new OAuthContext
 		{
+			RawUri = CleanUri(uri),
+			RequestMethod = httpMethod
+		};
+	}
+
+	public virtual IOAuthContext FromHttpRequest(HttpRequestMessage request)
+	{
+		var context = new OAuthContext
+		{
+			RawUri = CleanUri(request.RequestUri),
+			Cookies = CollectCookies(request),
+			Headers = GetCleanedNameValueCollection(request.Headers),
+			RequestMethod = request.Method.Method,
+			FormEncodedParameters = new NameValueCollection(), // HttpRequest.Form does not migrate cleanly to .NET Core
+			QueryParameters = HttpUtility.ParseQueryString(request.RequestUri.Query),
+		};
+
+		var rawContent = request.Content.ReadAsByteArrayAsync().Result;
+		if (rawContent.Length > 0) { context.RawContent = rawContent; }
+
+		ParseAuthorizationHeader(request.Headers, context);
+
+		return context;
+	}
+
+	public virtual IOAuthContext FromWebRequest(HttpWebRequest request, Stream rawBody)
+	{
+		using (var reader = new StreamReader(rawBody))
+		{
+			return FromWebRequest(request, reader.ReadToEnd());
+		}
+	}
+
+	public virtual IOAuthContext FromWebRequest(HttpWebRequest request, string body)
+	{
+		var context = new OAuthContext
+		{
+			RawUri = CleanUri(request.RequestUri),
+			Cookies = CollectCookies(request),
+			Headers = request.Headers,
+			RequestMethod = request.Method
+		};
+
+		var contentType = request.Headers[HttpRequestHeader.ContentType] ?? string.Empty;
+
+		if (contentType.ToLower().Contains("application/x-www-form-urlencoded"))
+		{
+			context.FormEncodedParameters = HttpUtility.ParseQueryString(body);
 		}
 
-		public virtual IOAuthContext FromUrl(string httpMethod, string url)
+		ParseAuthorizationHeader(request.Headers, context);
+
+		return context;
+	}
+
+	protected virtual NameValueCollection GetCleanedNameValueCollection(HttpRequestHeaders headers)
+	{
+		var nvc = new NameValueCollection();
+
+		foreach (var header in headers)
 		{
-			if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("url");
+			nvc.Add(header.Key, string.Join(";", header.Value));
+		}
 
-			Uri uri;
+		return nvc;
+	}
 
-			if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
+	protected virtual NameValueCollection GetCleanedNameValueCollection(NameValueCollection requestQueryString)
+	{
+		var nvc = new NameValueCollection(requestQueryString);
+
+		if (nvc.HasKeys())
+		{
+			nvc.Remove(null);
+		}
+
+		return nvc;
+	}
+
+	protected virtual Uri CleanUri(Uri uri)
+	{
+		var adjustedUri = _uriAdjuster(uri);
+		return RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(adjustedUri);
+	}
+
+	static Uri RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(Uri adjustedUri)
+	{
+		// this is a fix for OpenSocial platforms sometimes appending an empty query string parameter
+		// to their url.
+
+		var originalUrl = adjustedUri.OriginalString;
+		return originalUrl.EndsWith("&") ? new Uri(originalUrl.Substring(0, originalUrl.Length - 1)) : adjustedUri;
+	}
+
+	protected virtual NameValueCollection CollectCookies(WebRequest request)
+	{
+		return CollectCookiesFromHeaderString(request.Headers[HttpRequestHeader.Cookie]);
+	}
+
+	protected virtual NameValueCollection CollectCookies(HttpRequestMessage request)
+	{
+		return CollectCookiesFromHeaderString(request.Headers.GetValues("Set-Cookie").FirstOrDefault());
+	}
+
+	protected virtual NameValueCollection CollectCookiesFromHeaderString(string cookieHeader)
+	{
+		var cookieCollection = new NameValueCollection();
+
+		if (!string.IsNullOrEmpty(cookieHeader))
+		{
+			var cookies = cookieHeader.Split(';');
+			foreach (var cookie in cookies)
 			{
-				throw new ArgumentException($"Failed to parse url: {url} into a valid Uri instance");
-			}
+				//Remove the trailing and Leading white spaces
+				var strCookie = cookie.Trim();
 
-			return FromUri(httpMethod, uri);
-		}
-
-		public virtual IOAuthContext FromUri(string httpMethod, Uri uri)
-		{
-			uri = CleanUri(uri);
-
-			if (httpMethod == null) throw new ArgumentNullException("httpMethod");
-			if (uri == null) throw new ArgumentNullException("uri");
-
-			return new OAuthContext
-			{
-				RawUri = CleanUri(uri),
-				RequestMethod = httpMethod
-			};
-		}
-
-		public virtual IOAuthContext FromHttpRequest(HttpRequestMessage request)
-		{
-			var context = new OAuthContext
-			{
-				RawUri = CleanUri(request.RequestUri),
-				Cookies = CollectCookies(request),
-				Headers = GetCleanedNameValueCollection(request.Headers),
-				RequestMethod = request.Method.Method,
-				FormEncodedParameters = new NameValueCollection(), // HttpRequest.Form does not migrate cleanly to .NET Core
-				QueryParameters = HttpUtility.ParseQueryString(request.RequestUri.Query),
-			};
-
-			var rawContent = request.Content.ReadAsByteArrayAsync().Result;
-			if (rawContent.Length > 0) { context.RawContent = rawContent; }
-
-			ParseAuthorizationHeader(request.Headers, context);
-
-			return context;
-		}
-
-		public virtual IOAuthContext FromWebRequest(HttpWebRequest request, Stream rawBody)
-		{
-			using (var reader = new StreamReader(rawBody))
-			{
-				return FromWebRequest(request, reader.ReadToEnd());
-			}
-		}
-
-		public virtual IOAuthContext FromWebRequest(HttpWebRequest request, string body)
-		{
-			var context = new OAuthContext
-			{
-				RawUri = CleanUri(request.RequestUri),
-				Cookies = CollectCookies(request),
-				Headers = request.Headers,
-				RequestMethod = request.Method
-			};
-
-			var contentType = request.Headers[HttpRequestHeader.ContentType] ?? string.Empty;
-
-			if (contentType.ToLower().Contains("application/x-www-form-urlencoded"))
-			{
-				context.FormEncodedParameters = HttpUtility.ParseQueryString(body);
-			}
-
-			ParseAuthorizationHeader(request.Headers, context);
-
-			return context;
-		}
-
-		protected virtual NameValueCollection GetCleanedNameValueCollection(HttpRequestHeaders headers)
-		{
-			var nvc = new NameValueCollection();
-
-			foreach (var header in headers)
-			{
-				nvc.Add(header.Key, string.Join(";", header.Value));
-			}
-
-			return nvc;
-		}
-
-		protected virtual NameValueCollection GetCleanedNameValueCollection(NameValueCollection requestQueryString)
-		{
-			var nvc = new NameValueCollection(requestQueryString);
-
-			if (nvc.HasKeys())
-			{
-				nvc.Remove(null);
-			}
-
-			return nvc;
-		}
-
-		protected virtual Uri CleanUri(Uri uri)
-		{
-			var adjustedUri = _uriAdjuster(uri);
-			return RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(adjustedUri);
-		}
-
-		static Uri RemoveEmptyQueryStringParameterIntroducedBySomeOpenSocialPlatformImplementations(Uri adjustedUri)
-		{
-			// this is a fix for OpenSocial platforms sometimes appending an empty query string parameter
-			// to their url.
-
-			var originalUrl = adjustedUri.OriginalString;
-			return originalUrl.EndsWith("&") ? new Uri(originalUrl.Substring(0, originalUrl.Length - 1)) : adjustedUri;
-		}
-
-		protected virtual NameValueCollection CollectCookies(WebRequest request)
-		{
-			return CollectCookiesFromHeaderString(request.Headers[HttpRequestHeader.Cookie]);
-		}
-
-		protected virtual NameValueCollection CollectCookies(HttpRequestMessage request)
-		{
-			return CollectCookiesFromHeaderString(request.Headers.GetValues("Set-Cookie").FirstOrDefault());
-		}
-
-		protected virtual NameValueCollection CollectCookiesFromHeaderString(string cookieHeader)
-		{
-			var cookieCollection = new NameValueCollection();
-
-			if (!string.IsNullOrEmpty(cookieHeader))
-			{
-				var cookies = cookieHeader.Split(';');
-				foreach (var cookie in cookies)
+				var reg = new Regex(@"^(\S*)=(\S*)$");
+				if (reg.IsMatch(strCookie))
 				{
-					//Remove the trailing and Leading white spaces
-					var strCookie = cookie.Trim();
-
-					var reg = new Regex(@"^(\S*)=(\S*)$");
-					if (reg.IsMatch(strCookie))
+					var match = reg.Match(strCookie);
+					if (match.Groups.Count > 2)
 					{
-						var match = reg.Match(strCookie);
-						if (match.Groups.Count > 2)
-						{
-							cookieCollection.Add(match.Groups[1].Value,
-								HttpUtility.UrlDecode(match.Groups[2].Value).Replace(' ', '+'));
-							//HACK: find out why + is coming in as " "
-						}
+						cookieCollection.Add(match.Groups[1].Value,
+							HttpUtility.UrlDecode(match.Groups[2].Value).Replace(' ', '+'));
+						//HACK: find out why + is coming in as " "
 					}
 				}
 			}
-
-			return cookieCollection;
 		}
+
+		return cookieCollection;
+	}
 		
-		protected virtual void ParseAuthorizationHeader(NameValueCollection headers, OAuthContext context)
-		{
-			var authHeader = headers["Authorization"];
-			if (string.IsNullOrEmpty(authHeader)) return;
-			context.AuthorizationHeaderParameters = UriUtility
-				.GetHeaderParameters(authHeader).ToNameValueCollection();
-			context.UseAuthorizationHeader = true;
-		}
+	protected virtual void ParseAuthorizationHeader(NameValueCollection headers, OAuthContext context)
+	{
+		var authHeader = headers["Authorization"];
+		if (string.IsNullOrEmpty(authHeader)) return;
+		context.AuthorizationHeaderParameters = UriUtility
+			.GetHeaderParameters(authHeader).ToNameValueCollection();
+		context.UseAuthorizationHeader = true;
+	}
 
-		protected virtual void ParseAuthorizationHeader(HttpRequestHeaders headers, OAuthContext context)
-		{
-			var authHeader = headers.GetValues("Authorization").FirstOrDefault();
-			if (string.IsNullOrEmpty(authHeader)) return;
-			context.AuthorizationHeaderParameters = UriUtility
-				.GetHeaderParameters(authHeader).ToNameValueCollection();
-			context.UseAuthorizationHeader = true;
-		}
+	protected virtual void ParseAuthorizationHeader(HttpRequestHeaders headers, OAuthContext context)
+	{
+		var authHeader = headers.GetValues("Authorization").FirstOrDefault();
+		if (string.IsNullOrEmpty(authHeader)) return;
+		context.AuthorizationHeaderParameters = UriUtility
+			.GetHeaderParameters(authHeader).ToNameValueCollection();
+		context.UseAuthorizationHeader = true;
 	}
 }

@@ -29,108 +29,107 @@ using System.Linq;
 using DevDefined.OAuth.Utility;
 using Xunit;
 
-namespace DevDefined.OAuth.Tests.Utility
+namespace DevDefined.OAuth.Tests.Utility;
+
+public class StringUtilityTests
 {
-	public class StringUtilityTests
+	[Fact]
+	public void EqualsInConstantTime_ComparesInConstantTimeRegardlessOfPercentMatch_ToWithinMarginOfError()
 	{
-		[Fact]
-		public void EqualsInConstantTime_ComparesInConstantTimeRegardlessOfPercentMatch_ToWithinMarginOfError()
+		const int length = 10*1024; // 10K characters - big enough to avoid wild fluctuations in timing
+
+		const int numberOfTimestoCompare = 10000;
+
+		var value = GenerateTestString(1.0, length);
+
+		var rangesOfTime = Enumerable.Range(0, 100)
+			.Select(range => GenerateTestString((range/100.0), length)).ToArray()
+			.Select(other => TimeCompareValuesOverIterationsConstantTime(value, other, numberOfTimestoCompare))
+			.ToArray();
+
+		var stringEqualsRangesOfTime = Enumerable.Range(0, 100)
+			.Select(range => GenerateTestString((range/100.0), length)).ToArray()
+			.Select(other => TimeCompareValuesOverIterationsStringEquals(value, other, numberOfTimestoCompare))
+			.ToArray();
+
+		var percentDifference = CalculatePercentageDifference(rangesOfTime);
+
+		var percentDifferenceStringEquals = CalculatePercentageDifference(stringEqualsRangesOfTime);
+
+		Assert.True(percentDifference < 0.50m,
+			$"Difference in time when calculating is never greater then 50%, but was: {percentDifference:0.00%}");
+
+		// if you break here and check values, you should see that percentDifferenceStringEquals is dramatically wider i.e. maximum time to compare may be 100 times greater
+		// then minimum time to compare.
+
+		Assert.True(percentDifferenceStringEquals > percentDifference);
+	}
+
+	[Theory]
+	[InlineData("XY", "XY")]
+	[InlineData("42", "42")]
+	[InlineData("YX", "XY")]
+	[InlineData("Y", "Y")]
+	[InlineData("Y", "X")]
+	[InlineData("X", "Y")]
+	[InlineData("Xy", "XY")]
+	[InlineData("yX", "yX")]
+	[InlineData("XY", "Y")]
+	[InlineData("X", "XY")]
+	[InlineData("X", "")]
+	[InlineData("", "X")]
+	[InlineData(null, "XY")]
+	[InlineData("XY", null)]
+	[InlineData(null, null)]
+	[InlineData("", null)]
+	[InlineData(null, "")]
+	[InlineData("", "")]
+	public void EqualsInConstantTime_ReturnsSameResults_AsStringEquals(string value, string other)
+	{
+		var expected = string.Equals(value, other);
+		Assert.Equal(expected, value.EqualsInConstantTime(other));
+	}
+
+	static string GenerateTestString(double percentMatch, int length)
+	{
+		var matchLength = (int) (percentMatch*length);
+		var nonMatchLength = length - matchLength;
+
+		if (nonMatchLength == 0) return new string('X', length);
+
+		return new string('X', matchLength) + new string('Y', nonMatchLength);
+	}
+
+	static decimal CalculatePercentageDifference(long[] rangesOfTime)
+	{
+		var maxTime = rangesOfTime.Max();
+
+		var minTime = rangesOfTime.Min();
+
+		return 1.0m - ((1.0m/maxTime)*minTime);
+	}
+
+	public long TimeCompareValuesOverIterationsConstantTime(string value, string other, int iterations)
+	{
+		var stopWatch = Stopwatch.StartNew();
+
+		for (var i = 0; i < iterations; i++)
 		{
-			const int length = 10*1024; // 10K characters - big enough to avoid wild fluctuations in timing
-
-			const int numberOfTimestoCompare = 10000;
-
-			var value = GenerateTestString(1.0, length);
-
-			var rangesOfTime = Enumerable.Range(0, 100)
-				.Select(range => GenerateTestString((range/100.0), length)).ToArray()
-				.Select(other => TimeCompareValuesOverIterationsConstantTime(value, other, numberOfTimestoCompare))
-				.ToArray();
-
-			var stringEqualsRangesOfTime = Enumerable.Range(0, 100)
-				.Select(range => GenerateTestString((range/100.0), length)).ToArray()
-				.Select(other => TimeCompareValuesOverIterationsStringEquals(value, other, numberOfTimestoCompare))
-				.ToArray();
-
-			var percentDifference = CalculatePercentageDifference(rangesOfTime);
-
-			var percentDifferenceStringEquals = CalculatePercentageDifference(stringEqualsRangesOfTime);
-
-			Assert.True(percentDifference < 0.50m,
-				$"Difference in time when calculating is never greater then 50%, but was: {percentDifference:0.00%}");
-
-			// if you break here and check values, you should see that percentDifferenceStringEquals is dramatically wider i.e. maximum time to compare may be 100 times greater
-			// then minimum time to compare.
-
-			Assert.True(percentDifferenceStringEquals > percentDifference);
+			value.EqualsInConstantTime(other);
 		}
 
-		[Theory]
-		[InlineData("XY", "XY")]
-		[InlineData("42", "42")]
-		[InlineData("YX", "XY")]
-		[InlineData("Y", "Y")]
-		[InlineData("Y", "X")]
-		[InlineData("X", "Y")]
-		[InlineData("Xy", "XY")]
-		[InlineData("yX", "yX")]
-		[InlineData("XY", "Y")]
-		[InlineData("X", "XY")]
-		[InlineData("X", "")]
-		[InlineData("", "X")]
-		[InlineData(null, "XY")]
-		[InlineData("XY", null)]
-		[InlineData(null, null)]
-		[InlineData("", null)]
-		[InlineData(null, "")]
-		[InlineData("", "")]
-		public void EqualsInConstantTime_ReturnsSameResults_AsStringEquals(string value, string other)
+		return stopWatch.ElapsedTicks;
+	}
+
+	public long TimeCompareValuesOverIterationsStringEquals(string value, string other, int iterations)
+	{
+		var stopWatch = Stopwatch.StartNew();
+
+		for (var i = 0; i < iterations; i++)
 		{
-			var expected = string.Equals(value, other);
-			Assert.Equal(expected, value.EqualsInConstantTime(other));
+			value.Equals(other);
 		}
 
-		static string GenerateTestString(double percentMatch, int length)
-		{
-			var matchLength = (int) (percentMatch*length);
-			var nonMatchLength = length - matchLength;
-
-			if (nonMatchLength == 0) return new string('X', length);
-
-			return new string('X', matchLength) + new string('Y', nonMatchLength);
-		}
-
-		static decimal CalculatePercentageDifference(long[] rangesOfTime)
-		{
-			var maxTime = rangesOfTime.Max();
-
-			var minTime = rangesOfTime.Min();
-
-			return 1.0m - ((1.0m/maxTime)*minTime);
-		}
-
-		public long TimeCompareValuesOverIterationsConstantTime(string value, string other, int iterations)
-		{
-			var stopWatch = Stopwatch.StartNew();
-
-			for (var i = 0; i < iterations; i++)
-			{
-				value.EqualsInConstantTime(other);
-			}
-
-			return stopWatch.ElapsedTicks;
-		}
-
-		public long TimeCompareValuesOverIterationsStringEquals(string value, string other, int iterations)
-		{
-			var stopWatch = Stopwatch.StartNew();
-
-			for (var i = 0; i < iterations; i++)
-			{
-				value.Equals(other);
-			}
-
-			return stopWatch.ElapsedTicks;
-		}
+		return stopWatch.ElapsedTicks;
 	}
 }

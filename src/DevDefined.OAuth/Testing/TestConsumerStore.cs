@@ -31,33 +31,32 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Storage;
 using DevDefined.OAuth.Tests;
 
-namespace DevDefined.OAuth.Testing
+namespace DevDefined.OAuth.Testing;
+
+public class TestConsumerStore : IConsumerStore
 {
-	public class TestConsumerStore : IConsumerStore
+	public bool IsConsumer(IConsumer consumer)
 	{
-		public bool IsConsumer(IConsumer consumer)
-		{
-			return (consumer.ConsumerKey == "key" && string.IsNullOrEmpty(consumer.Realm));
-		}
+		return (consumer.ConsumerKey == "key" && string.IsNullOrEmpty(consumer.Realm));
+	}
 
-		public void SetConsumerSecret(IConsumer consumer, string consumerSecret)
-		{
-			throw new NotImplementedException();
-		}
+	public void SetConsumerSecret(IConsumer consumer, string consumerSecret)
+	{
+		throw new NotImplementedException();
+	}
 
-		public string GetConsumerSecret(IOAuthContext consumer)
-		{
-			return "secret";
-		}
+	public string GetConsumerSecret(IOAuthContext consumer)
+	{
+		return "secret";
+	}
 
-		public void SetConsumerCertificate(IConsumer consumer, X509Certificate2 certificate)
-		{
-			throw new NotImplementedException();
-		}
+	public void SetConsumerCertificate(IConsumer consumer, X509Certificate2 certificate)
+	{
+		throw new NotImplementedException();
+	}
 
-		public AsymmetricAlgorithm GetConsumerPublicKey(IConsumer consumer)
-		{
-			return TestCertificates.OAuthTestCertificate().PublicKey.Key;
-		}
+	public AsymmetricAlgorithm GetConsumerPublicKey(IConsumer consumer)
+	{
+		return TestCertificates.OAuthTestCertificate().PublicKey.Key;
 	}
 }

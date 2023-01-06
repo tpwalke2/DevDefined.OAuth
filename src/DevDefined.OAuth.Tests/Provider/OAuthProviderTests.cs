@@ -33,186 +33,185 @@ using DevDefined.OAuth.Testing;
 using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
-namespace DevDefined.OAuth.Tests.Provider
+namespace DevDefined.OAuth.Tests.Provider;
+
+public class OAuthProvider10Tests
 {
-	public class OAuthProvider10Tests
+	readonly OAuthProvider provider;
+
+	public OAuthProvider10Tests()
 	{
-		readonly OAuthProvider provider;
+		var tokenStore = new TestTokenStore();
+		var consumerStore = new TestConsumerStore();
+		var nonceStore = new TestNonceStore();
 
-		public OAuthProvider10Tests()
+		provider = new OAuthProvider(tokenStore,
+			new SignatureValidationInspector(consumerStore),
+			new NonceStoreInspector(nonceStore),
+			new TimestampRangeInspector(new TimeSpan(1, 0, 0)),
+			new ConsumerValidationInspector(consumerStore),
+			new XAuthValidationInspector(ValidateXAuthMode, AuthenticateXAuthUsernameAndPassword));
+	}
+
+	static IOAuthSession CreateConsumer(string signatureMethod)
+	{
+		var consumerContext = new OAuthConsumerContext
 		{
-			var tokenStore = new TestTokenStore();
-			var consumerStore = new TestConsumerStore();
-			var nonceStore = new TestNonceStore();
+			SignatureMethod = signatureMethod,
+			ConsumerKey = "key",
+			ConsumerSecret = "secret",
+			Key = TestCertificates.OAuthTestCertificate().GetRSAPrivateKey()
+		};
 
-			provider = new OAuthProvider(tokenStore,
-			                             new SignatureValidationInspector(consumerStore),
-			                             new NonceStoreInspector(nonceStore),
-			                             new TimestampRangeInspector(new TimeSpan(1, 0, 0)),
-			                             new ConsumerValidationInspector(consumerStore),
-                                   new XAuthValidationInspector(ValidateXAuthMode, AuthenticateXAuthUsernameAndPassword));
-		}
+		var session = new OAuthSession(consumerContext, "http://localhost/oauth/requesttoken.rails",
+			"http://localhost/oauth/userauhtorize.rails",
+			"http://localhost/oauth/accesstoken.rails");
 
-		static IOAuthSession CreateConsumer(string signatureMethod)
-		{
-			var consumerContext = new OAuthConsumerContext
-			                      	{
-			                      		SignatureMethod = signatureMethod,
-			                      		ConsumerKey = "key",
-			                      		ConsumerSecret = "secret",
-			                      		Key = TestCertificates.OAuthTestCertificate().GetRSAPrivateKey()
-			                      	};
+		return session;
+	}
 
-			var session = new OAuthSession(consumerContext, "http://localhost/oauth/requesttoken.rails",
-			                               "http://localhost/oauth/userauhtorize.rails",
-			                               "http://localhost/oauth/accesstoken.rails");
+	public bool ValidateXAuthMode(string authMode)
+	{
+		return authMode == "client_auth";
+	}
 
-			return session;
-		}
+	public bool AuthenticateXAuthUsernameAndPassword(string username, string password)
+	{
+		return username == "username" && password == "password";
+	}
 
-    public bool ValidateXAuthMode(string authMode)
-    {
-      return authMode == "client_auth";
-    }
+	[Fact]
+	public void AccessProtectedResource()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		session.AccessToken = new TokenBase {ConsumerKey = "key", Token = "accesskey", TokenSecret = "accesssecret"};
+		var context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
+		context.TokenSecret = null;
+		provider.AccessProtectedResourceRequest(context);
+	}
 
-    public bool AuthenticateXAuthUsernameAndPassword(string username, string password)
-    {
-      return username == "username" && password == "password";
-    }
+	[Fact]
+	public void AccessProtectedResourceWithPlainText()
+	{
+		var session = CreateConsumer(SignatureMethod.PlainText);
+		session.AccessToken = new TokenBase {ConsumerKey = "key", Token = "accesskey", TokenSecret = "accesssecret"};
+		var context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
+		context.TokenSecret = null;
+		provider.AccessProtectedResourceRequest(context);
+	}
 
-		[Fact]
-		public void AccessProtectedResource()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			session.AccessToken = new TokenBase {ConsumerKey = "key", Token = "accesskey", TokenSecret = "accesssecret"};
-			var context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
-			context.TokenSecret = null;
-			provider.AccessProtectedResourceRequest(context);
-		}
+	[Fact]
+	public void ExchangeRequestTokenForAccessToken()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context =
+			session.BuildExchangeRequestTokenForAccessTokenContext(
+				new TokenBase {ConsumerKey = "key", Token = "requestkey", TokenSecret = "requestsecret"}, "GET", null).Context;
+		context.TokenSecret = null;
+		var accessToken = provider.ExchangeRequestTokenForAccessToken(context);
+		Assert.Equal("accesskey", accessToken.Token);
+		Assert.Equal("accesssecret", accessToken.TokenSecret);
+	}
 
-		[Fact]
-		public void AccessProtectedResourceWithPlainText()
-		{
-			var session = CreateConsumer(SignatureMethod.PlainText);
-			session.AccessToken = new TokenBase {ConsumerKey = "key", Token = "accesskey", TokenSecret = "accesssecret"};
-			var context = session.Request().Get().ForUrl("http://localhost/protected.rails").SignWithToken().Context;
-			context.TokenSecret = null;
-			provider.AccessProtectedResourceRequest(context);
-		}
+	[Fact]
+	public void ExchangeRequestTokenForAccessTokenPlainText()
+	{
+		var session = CreateConsumer(SignatureMethod.PlainText);
+		var context =
+			session.BuildExchangeRequestTokenForAccessTokenContext(
+				new TokenBase {ConsumerKey = "key", Token = "requestkey", TokenSecret = "requestsecret"}, "GET", null).Context;
+		context.TokenSecret = null;
+		var accessToken = provider.ExchangeRequestTokenForAccessToken(context);
+		Assert.Equal("accesskey", accessToken.Token);
+		Assert.Equal("accesssecret", accessToken.TokenSecret);
+	}
 
-		[Fact]
-		public void ExchangeRequestTokenForAccessToken()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context =
-				session.BuildExchangeRequestTokenForAccessTokenContext(
-					new TokenBase {ConsumerKey = "key", Token = "requestkey", TokenSecret = "requestsecret"}, "GET", null).Context;
-			context.TokenSecret = null;
-			var accessToken = provider.ExchangeRequestTokenForAccessToken(context);
-			Assert.Equal("accesskey", accessToken.Token);
-			Assert.Equal("accesssecret", accessToken.TokenSecret);
-		}
+	[Fact]
+	public void ExchangeTokensWhenVerifierIsMatchDoesNotThrowException()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context = session.BuildExchangeRequestTokenForAccessTokenContext(
+			new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "GzvVb5WjWfHKa/0JuFupaMyn").Context;
+		provider.ExchangeRequestTokenForAccessToken(context);
+	}
 
-		[Fact]
-		public void ExchangeRequestTokenForAccessTokenPlainText()
-		{
-			var session = CreateConsumer(SignatureMethod.PlainText);
-			var context =
-				session.BuildExchangeRequestTokenForAccessTokenContext(
-					new TokenBase {ConsumerKey = "key", Token = "requestkey", TokenSecret = "requestsecret"}, "GET", null).Context;
-			context.TokenSecret = null;
-			var accessToken = provider.ExchangeRequestTokenForAccessToken(context);
-			Assert.Equal("accesskey", accessToken.Token);
-			Assert.Equal("accesssecret", accessToken.TokenSecret);
-		}
+	[Fact]
+	public void RequestTokenWithHmacSha1()
+	{
+		var session = CreateConsumer(SignatureMethod.HmacSha1);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		var token = provider.GrantRequestToken(context);
+		Assert.Equal("requestkey", token.Token);
+		Assert.Equal("requestsecret", token.TokenSecret);
+	}
 
-		[Fact]
-		public void ExchangeTokensWhenVerifierIsMatchDoesNotThrowException()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context = session.BuildExchangeRequestTokenForAccessTokenContext(
-				new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "GzvVb5WjWfHKa/0JuFupaMyn").Context;
-			provider.ExchangeRequestTokenForAccessToken(context);
-		}
+	[Fact]
+	public void RequestTokenWithHmacSha1WithInvalidSignatureThrows()
+	{
+		var session = CreateConsumer(SignatureMethod.HmacSha1);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		context.Signature = "wrong";
+		var ex = Assert.Throws<OAuthException>(() => (provider.GrantRequestToken(context)));
+		Assert.Equal("Failed to validate signature", ex.Message);
+	}
 
-		[Fact]
-		public void RequestTokenWithHmacSha1()
-		{
-			var session = CreateConsumer(SignatureMethod.HmacSha1);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			var token = provider.GrantRequestToken(context);
-			Assert.Equal("requestkey", token.Token);
-			Assert.Equal("requestsecret", token.TokenSecret);
-		}
+	[Fact]
+	public void RequestTokenWithInvalidConsumerKeyThrowsException()
+	{
+		var session = CreateConsumer(SignatureMethod.PlainText);
+		session.ConsumerContext.ConsumerKey = "invalid";
+		var context = session.BuildRequestTokenContext("GET").Context;
+		var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
+		Assert.Equal("Unknown Consumer (Realm: , Key: invalid)", ex.Message);
+	}
 
-		[Fact]
-		public void RequestTokenWithHmacSha1WithInvalidSignatureThrows()
-		{
-			var session = CreateConsumer(SignatureMethod.HmacSha1);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			context.Signature = "wrong";
-			var ex = Assert.Throws<OAuthException>(() => (provider.GrantRequestToken(context)));
-			Assert.Equal("Failed to validate signature", ex.Message);
-		}
+	[Fact]
+	public void RequestTokenWithPlainText()
+	{
+		var session = CreateConsumer(SignatureMethod.PlainText);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		var token = provider.GrantRequestToken(context);
+		Assert.Equal("requestkey", token.Token);
+		Assert.Equal("requestsecret", token.TokenSecret);
+	}
 
-		[Fact]
-		public void RequestTokenWithInvalidConsumerKeyThrowsException()
-		{
-			var session = CreateConsumer(SignatureMethod.PlainText);
-			session.ConsumerContext.ConsumerKey = "invalid";
-			var context = session.BuildRequestTokenContext("GET").Context;
-			var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
-			Assert.Equal("Unknown Consumer (Realm: , Key: invalid)", ex.Message);
-		}
+	[Fact]
+	public void RequestTokenWithRsaSha1()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		var token = provider.GrantRequestToken(context);
+		Assert.Equal("requestkey", token.Token);
+		Assert.Equal("requestsecret", token.TokenSecret);
+	}
 
-		[Fact]
-		public void RequestTokenWithPlainText()
-		{
-			var session = CreateConsumer(SignatureMethod.PlainText);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			var token = provider.GrantRequestToken(context);
-			Assert.Equal("requestkey", token.Token);
-			Assert.Equal("requestsecret", token.TokenSecret);
-		}
+	[Fact]
+	public void RequestTokenWithRsaSha1WithInvalidSignatureThrows()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		context.Signature =
+			"eeh8hLNIlNNq1Xrp7BOCc+xgY/K8AmjxKNM7UdLqqcvNSmJqcPcf7yQIOvu8oj5R/mDvBpSb3+CEhxDoW23gggsddPIxNdOcDuEOenugoCifEY6nRz8sbtYt3GHXsDS2esEse/N8bWgDdOm2FRDKuy9OOluQuKXLjx5wkD/KYMY=";
+		var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
+		Assert.Equal("Failed to validate signature", ex.Message);
+	}
 
-		[Fact]
-		public void RequestTokenWithRsaSha1()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			var token = provider.GrantRequestToken(context);
-			Assert.Equal("requestkey", token.Token);
-			Assert.Equal("requestsecret", token.TokenSecret);
-		}
+	[Fact]
+	public void RequestTokenWithTokenSecretParamterThrowsException()
+	{
+		IOAuthContext context = new OAuthContext {TokenSecret = "secret"};
+		var ex = Assert.Throws<OAuthException>(() => provider.ExchangeRequestTokenForAccessToken(context));
+		Assert.Equal("The oauth_token_secret must not be transmitted to the provider.", ex.Message);
+	}
 
-		[Fact]
-		public void RequestTokenWithRsaSha1WithInvalidSignatureThrows()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			context.Signature =
-				"eeh8hLNIlNNq1Xrp7BOCc+xgY/K8AmjxKNM7UdLqqcvNSmJqcPcf7yQIOvu8oj5R/mDvBpSb3+CEhxDoW23gggsddPIxNdOcDuEOenugoCifEY6nRz8sbtYt3GHXsDS2esEse/N8bWgDdOm2FRDKuy9OOluQuKXLjx5wkD/KYMY=";
-			var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
-			Assert.Equal("Failed to validate signature", ex.Message);
-		}
-
-		[Fact]
-		public void RequestTokenWithTokenSecretParamterThrowsException()
-		{
-			IOAuthContext context = new OAuthContext {TokenSecret = "secret"};
-			var ex = Assert.Throws<OAuthException>(() => provider.ExchangeRequestTokenForAccessToken(context));
-			Assert.Equal("The oauth_token_secret must not be transmitted to the provider.", ex.Message);
-		}
-
-    [Fact]
-    public void AccessTokenWithHmacSha1()
-    {
-      var session = CreateConsumer(SignatureMethod.HmacSha1);
-      var context = session.BuildAccessTokenContext("GET", "client_auth", "username", "password").Context;
-      context.TokenSecret = null;
-      var accessToken = provider.CreateAccessToken(context);
-      Assert.Equal("accesskey", accessToken.Token);
-      Assert.Equal("accesssecret", accessToken.TokenSecret);
-    }
-  }
+	[Fact]
+	public void AccessTokenWithHmacSha1()
+	{
+		var session = CreateConsumer(SignatureMethod.HmacSha1);
+		var context = session.BuildAccessTokenContext("GET", "client_auth", "username", "password").Context;
+		context.TokenSecret = null;
+		var accessToken = provider.CreateAccessToken(context);
+		Assert.Equal("accesskey", accessToken.Token);
+		Assert.Equal("accesssecret", accessToken.TokenSecret);
+	}
 }

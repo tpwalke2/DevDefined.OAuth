@@ -27,18 +27,17 @@
 using System;
 using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth
-{
-	/// <summary>
-	/// Generates unique nonces (via Guids) to let the server detect duplicated requests.
-	/// </summary>
-	public class GuidNonceGenerator : INonceGenerator
-	{
-		protected Random random = new Random();
+namespace DevDefined.OAuth;
 
-		public string GenerateNonce(IOAuthContext context)
-		{
-			return Guid.NewGuid().ToString();
-		}
+/// <summary>
+/// Generates unique nonces (via Guids) to let the server detect duplicated requests.
+/// </summary>
+public class GuidNonceGenerator : INonceGenerator
+{
+	protected Random random = new Random();
+
+	public string GenerateNonce(IOAuthContext context)
+	{
+		return Guid.NewGuid().ToString();
 	}
 }

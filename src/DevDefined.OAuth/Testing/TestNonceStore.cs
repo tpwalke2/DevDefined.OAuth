@@ -28,43 +28,42 @@ using System.Collections.Generic;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Storage;
 
-namespace DevDefined.OAuth.Testing
+namespace DevDefined.OAuth.Testing;
+
+/// <summary>
+/// A simple nonce store that just tracks all nonces by consumer key in memory.
+/// </summary>
+public class TestNonceStore : INonceStore
 {
-	/// <summary>
-	/// A simple nonce store that just tracks all nonces by consumer key in memory.
-	/// </summary>
-	public class TestNonceStore : INonceStore
+	readonly Dictionary<string, List<string>> _nonces = new Dictionary<string, List<string>>();
+
+	public bool RecordNonceAndCheckIsUnique(IConsumer consumer, string nonce)
 	{
-		readonly Dictionary<string, List<string>> _nonces = new Dictionary<string, List<string>>();
-
-		public bool RecordNonceAndCheckIsUnique(IConsumer consumer, string nonce)
+		var list = GetNonceListForConsumer(consumer.ConsumerKey);
+		lock (list)
 		{
-			var list = GetNonceListForConsumer(consumer.ConsumerKey);
-			lock (list)
-			{
-				if (list.Contains(nonce)) return false;
-				list.Add(nonce);
-				return true;
-			}
+			if (list.Contains(nonce)) return false;
+			list.Add(nonce);
+			return true;
 		}
+	}
 
-		List<string> GetNonceListForConsumer(string consumerKey)
+	List<string> GetNonceListForConsumer(string consumerKey)
+	{
+		var list = new List<string>();
+
+		if (!_nonces.TryGetValue(consumerKey, out list))
 		{
-			var list = new List<string>();
-
-			if (!_nonces.TryGetValue(consumerKey, out list))
+			lock (_nonces)
 			{
-				lock (_nonces)
+				if (!_nonces.TryGetValue(consumerKey, out list))
 				{
-					if (!_nonces.TryGetValue(consumerKey, out list))
-					{
-						list = new List<string>();
-						_nonces[consumerKey] = list;
-					}
+					list = new List<string>();
+					_nonces[consumerKey] = list;
 				}
 			}
-
-			return list;
 		}
+
+		return list;
 	}
 }

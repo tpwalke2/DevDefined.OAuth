@@ -29,56 +29,55 @@ using System.Security.Cryptography;
 using System.Text;
 using DevDefined.OAuth.Utility;
 
-namespace DevDefined.OAuth.Framework.Signing
+namespace DevDefined.OAuth.Framework.Signing;
+
+public class HmacSha1SignatureImplementation : IContextSignatureImplementation
 {
-	public class HmacSha1SignatureImplementation : IContextSignatureImplementation
+	public string MethodName
 	{
-		public string MethodName
+		get { return SignatureMethod.HmacSha1; }
+	}
+
+	public void SignContext(IOAuthContext authContext, SigningContext signingContext)
+	{
+		authContext.Signature = GenerateSignature(authContext, signingContext);
+	}
+
+	public bool ValidateSignature(IOAuthContext authContext, SigningContext signingContext)
+	{
+		return authContext.Signature.EqualsInConstantTime(GenerateSignature(authContext, signingContext));
+	}
+
+	static string GenerateSignature(IToken authContext, SigningContext signingContext)
+	{
+		var consumerSecret = (signingContext.ConsumerSecret != null)
+			? UriUtility.UrlEncode(signingContext.ConsumerSecret)
+			: "";
+		var tokenSecret = (authContext.TokenSecret != null)
+			? UriUtility.UrlEncode(authContext.TokenSecret)
+			: null;
+		var hashSource = $"{consumerSecret}&{tokenSecret}";
+
+		var hashAlgorithm = new HMACSHA1 {Key = Encoding.ASCII.GetBytes(hashSource)};
+
+		return ComputeHash(hashAlgorithm, signingContext.SignatureBase);
+	}
+
+	static string ComputeHash(HashAlgorithm hashAlgorithm, string data)
+	{
+		if (hashAlgorithm == null)
 		{
-			get { return SignatureMethod.HmacSha1; }
+			throw new ArgumentNullException("hashAlgorithm");
 		}
 
-		public void SignContext(IOAuthContext authContext, SigningContext signingContext)
+		if (string.IsNullOrEmpty(data))
 		{
-			authContext.Signature = GenerateSignature(authContext, signingContext);
+			throw new ArgumentNullException("data");
 		}
 
-		public bool ValidateSignature(IOAuthContext authContext, SigningContext signingContext)
-		{
-			return authContext.Signature.EqualsInConstantTime(GenerateSignature(authContext, signingContext));
-		}
+		var dataBuffer = Encoding.ASCII.GetBytes(data);
+		var hashBytes = hashAlgorithm.ComputeHash(dataBuffer);
 
-		static string GenerateSignature(IToken authContext, SigningContext signingContext)
-		{
-			var consumerSecret = (signingContext.ConsumerSecret != null)
-			                        	? UriUtility.UrlEncode(signingContext.ConsumerSecret)
-			                        	: "";
-			var tokenSecret = (authContext.TokenSecret != null)
-			                     	? UriUtility.UrlEncode(authContext.TokenSecret)
-			                     	: null;
-			var hashSource = $"{consumerSecret}&{tokenSecret}";
-
-			var hashAlgorithm = new HMACSHA1 {Key = Encoding.ASCII.GetBytes(hashSource)};
-
-			return ComputeHash(hashAlgorithm, signingContext.SignatureBase);
-		}
-
-		static string ComputeHash(HashAlgorithm hashAlgorithm, string data)
-		{
-			if (hashAlgorithm == null)
-			{
-				throw new ArgumentNullException("hashAlgorithm");
-			}
-
-			if (string.IsNullOrEmpty(data))
-			{
-				throw new ArgumentNullException("data");
-			}
-
-			var dataBuffer = Encoding.ASCII.GetBytes(data);
-			var hashBytes = hashAlgorithm.ComputeHash(dataBuffer);
-
-			return Convert.ToBase64String(hashBytes);
-		}
+		return Convert.ToBase64String(hashBytes);
 	}
 }

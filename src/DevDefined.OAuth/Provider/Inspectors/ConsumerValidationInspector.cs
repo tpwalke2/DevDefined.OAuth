@@ -28,24 +28,23 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Storage;
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+public class ConsumerValidationInspector : IContextInspector
 {
-	public class ConsumerValidationInspector : IContextInspector
+	readonly IConsumerStore _consumerStore;
+
+	public ConsumerValidationInspector(IConsumerStore consumerStore)
 	{
-		readonly IConsumerStore _consumerStore;
+		if (consumerStore == null) throw new ArgumentNullException("consumerStore");
+		_consumerStore = consumerStore;
+	}
 
-		public ConsumerValidationInspector(IConsumerStore consumerStore)
+	public void InspectContext(ProviderPhase phase, IOAuthContext context)
+	{
+		if (!_consumerStore.IsConsumer(context))
 		{
-			if (consumerStore == null) throw new ArgumentNullException("consumerStore");
-			_consumerStore = consumerStore;
-		}
-
-		public void InspectContext(ProviderPhase phase, IOAuthContext context)
-		{
-			if (!_consumerStore.IsConsumer(context))
-			{
-				throw Error.UnknownConsumerKey(context);
-			}
+			throw Error.UnknownConsumerKey(context);
 		}
 	}
 }

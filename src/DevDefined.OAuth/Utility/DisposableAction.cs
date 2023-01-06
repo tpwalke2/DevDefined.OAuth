@@ -26,20 +26,19 @@
 
 using System;
 
-namespace DevDefined.OAuth.Utility
+namespace DevDefined.OAuth.Utility;
+
+public class DisposableAction : IDisposable
 {
-	public class DisposableAction : IDisposable
+	readonly Action _action;
+
+	public DisposableAction(Action action)
 	{
-		readonly Action _action;
+		_action = action;
+	}
 
-		public DisposableAction(Action action)
-		{
-			_action = action;
-		}
-
-		public void Dispose()
-		{
-			if (_action != null) _action();
-		}
+	public void Dispose()
+	{
+		if (_action != null) _action();
 	}
 }

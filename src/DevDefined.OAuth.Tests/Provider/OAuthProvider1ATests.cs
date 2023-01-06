@@ -33,90 +33,89 @@ using DevDefined.OAuth.Testing;
 using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
-namespace DevDefined.OAuth.Tests.Provider
+namespace DevDefined.OAuth.Tests.Provider;
+
+public class OAuthProvider1ATests
 {
-	public class OAuthProvider1ATests
+	readonly OAuthProvider provider;
+
+	public OAuthProvider1ATests()
 	{
-		readonly OAuthProvider provider;
+		var tokenStore = new TestTokenStore();
+		var consumerStore = new TestConsumerStore();
+		var nonceStore = new TestNonceStore();
 
-		public OAuthProvider1ATests()
+		provider = new OAuthProvider(tokenStore,
+			new SignatureValidationInspector(consumerStore),
+			new NonceStoreInspector(nonceStore),
+			new TimestampRangeInspector(new TimeSpan(1, 0, 0)),
+			new ConsumerValidationInspector(consumerStore),
+			new OAuth10AInspector(tokenStore));
+	}
+
+	static IOAuthSession CreateConsumer(string signatureMethod)
+	{
+		var consumerContext = new OAuthConsumerContext
 		{
-			var tokenStore = new TestTokenStore();
-			var consumerStore = new TestConsumerStore();
-			var nonceStore = new TestNonceStore();
+			SignatureMethod = signatureMethod,
+			ConsumerKey = "key",
+			ConsumerSecret = "secret",
+			Key = TestCertificates.OAuthTestCertificate().GetRSAPrivateKey()
+		};
 
-			provider = new OAuthProvider(tokenStore,
-			                             new SignatureValidationInspector(consumerStore),
-			                             new NonceStoreInspector(nonceStore),
-			                             new TimestampRangeInspector(new TimeSpan(1, 0, 0)),
-			                             new ConsumerValidationInspector(consumerStore),
-			                             new OAuth10AInspector(tokenStore));
-		}
+		var session = new OAuthSession(consumerContext, "http://localhost/oauth/requesttoken.rails",
+			"http://localhost/oauth/userauhtorize.rails",
+			"http://localhost/oauth/accesstoken.rails");
 
-		static IOAuthSession CreateConsumer(string signatureMethod)
-		{
-			var consumerContext = new OAuthConsumerContext
-			                      	{
-			                      		SignatureMethod = signatureMethod,
-			                      		ConsumerKey = "key",
-			                      		ConsumerSecret = "secret",
-			                      		Key = TestCertificates.OAuthTestCertificate().GetRSAPrivateKey()
-			                      	};
+		return session;
+	}
 
-			var session = new OAuthSession(consumerContext, "http://localhost/oauth/requesttoken.rails",
-			                               "http://localhost/oauth/userauhtorize.rails",
-			                               "http://localhost/oauth/accesstoken.rails");
+	[Fact]
+	public void ExchangeTokensWhenVerifierIsMatchDoesNotThrowException()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context = session.BuildExchangeRequestTokenForAccessTokenContext(
+			new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "GzvVb5WjWfHKa/0JuFupaMyn").Context;
+		provider.ExchangeRequestTokenForAccessToken(context);
+	}
 
-			return session;
-		}
+	[Fact]
+	public void ExchangeTokensWhenVerifierIsMissingThrowsException()
+	{
+		string verifier = null;
 
-		[Fact]
-		public void ExchangeTokensWhenVerifierIsMatchDoesNotThrowException()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context = session.BuildExchangeRequestTokenForAccessTokenContext(
-				new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "GzvVb5WjWfHKa/0JuFupaMyn").Context;
-			provider.ExchangeRequestTokenForAccessToken(context);
-		}
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context = session.BuildExchangeRequestTokenForAccessTokenContext(
+			new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", verifier).Context;
+		var ex = Assert.Throws<OAuthException>(() => provider.ExchangeRequestTokenForAccessToken(context));
+		Assert.Equal("Missing required parameter : oauth_verifier", ex.Message);
+	}
 
-		[Fact]
-		public void ExchangeTokensWhenVerifierIsMissingThrowsException()
-		{
-			string verifier = null;
+	[Fact]
+	public void ExchangeTokensWhenVerifierIsWrongThrowsException()
+	{
+		var session = CreateConsumer(SignatureMethod.RsaSha1);
+		var context = session.BuildExchangeRequestTokenForAccessTokenContext(
+			new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "wrong").Context;
+		var ex = Assert.Throws<OAuthException>(() => provider.ExchangeRequestTokenForAccessToken(context));
+		Assert.Equal("The parameter \"oauth_verifier\" was rejected", ex.Message);
+	}
 
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context = session.BuildExchangeRequestTokenForAccessTokenContext(
-				new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", verifier).Context;
-			var ex = Assert.Throws<OAuthException>(() => provider.ExchangeRequestTokenForAccessToken(context));
-			Assert.Equal("Missing required parameter : oauth_verifier", ex.Message);
-		}
+	[Fact]
+	public void RequestTokenWithCallbackDoesNotThrowException()
+	{
+		var session = CreateConsumer(SignatureMethod.PlainText);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		provider.GrantRequestToken(context);
+	}
 
-		[Fact]
-		public void ExchangeTokensWhenVerifierIsWrongThrowsException()
-		{
-			var session = CreateConsumer(SignatureMethod.RsaSha1);
-			var context = session.BuildExchangeRequestTokenForAccessTokenContext(
-				new TokenBase {ConsumerKey = "key", Token = "requestkey"}, "GET", "wrong").Context;
-			var ex = Assert.Throws<OAuthException>(() => provider.ExchangeRequestTokenForAccessToken(context));
-			Assert.Equal("The parameter \"oauth_verifier\" was rejected", ex.Message);
-		}
-
-		[Fact]
-		public void RequestTokenWithCallbackDoesNotThrowException()
-		{
-			var session = CreateConsumer(SignatureMethod.PlainText);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			provider.GrantRequestToken(context);
-		}
-
-		[Fact]
-		public void RequestTokenWithoutCallbackWillThrowException()
-		{
-			var session = CreateConsumer(SignatureMethod.PlainText);
-			var context = session.BuildRequestTokenContext("GET").Context;
-			context.CallbackUrl = null; // clear parameter, as it will default to "oob"
-			var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
-			Assert.Equal("Missing required parameter : oauth_callback", ex.Message);
-		}
+	[Fact]
+	public void RequestTokenWithoutCallbackWillThrowException()
+	{
+		var session = CreateConsumer(SignatureMethod.PlainText);
+		var context = session.BuildRequestTokenContext("GET").Context;
+		context.CallbackUrl = null; // clear parameter, as it will default to "oob"
+		var ex = Assert.Throws<OAuthException>(() => provider.GrantRequestToken(context));
+		Assert.Equal("Missing required parameter : oauth_callback", ex.Message);
 	}
 }

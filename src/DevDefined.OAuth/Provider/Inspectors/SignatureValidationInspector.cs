@@ -28,49 +28,48 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Framework.Signing;
 using DevDefined.OAuth.Storage;
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+public class SignatureValidationInspector : IContextInspector
 {
-	public class SignatureValidationInspector : IContextInspector
+	readonly IConsumerStore _consumerStore;
+	readonly IOAuthContextSigner _signer;
+
+	public SignatureValidationInspector(IConsumerStore consumerStore)
+		: this(consumerStore, new OAuthContextSigner())
 	{
-		readonly IConsumerStore _consumerStore;
-		readonly IOAuthContextSigner _signer;
+	}
 
-		public SignatureValidationInspector(IConsumerStore consumerStore)
-			: this(consumerStore, new OAuthContextSigner())
+	public SignatureValidationInspector(IConsumerStore consumerStore, IOAuthContextSigner signer)
+	{
+		_consumerStore = consumerStore;
+		_signer = signer;
+	}
+
+	public virtual void InspectContext(ProviderPhase phase, IOAuthContext context)
+	{
+		var signingContext = CreateSignatureContextForConsumer(context);
+
+		if (!_signer.ValidateSignature(context, signingContext))
 		{
+			throw Error.FailedToValidateSignature(context);
+		}
+	}
+
+	protected virtual bool SignatureMethodRequiresCertificate(string signatureMethod)
+	{
+		return ((signatureMethod != SignatureMethod.HmacSha1) && (signatureMethod != SignatureMethod.PlainText));
+	}
+
+	protected virtual SigningContext CreateSignatureContextForConsumer(IOAuthContext context)
+	{
+		var signingContext = new SigningContext {ConsumerSecret = _consumerStore.GetConsumerSecret(context)};
+
+		if (SignatureMethodRequiresCertificate(context.SignatureMethod))
+		{
+			signingContext.Algorithm = _consumerStore.GetConsumerPublicKey(context);				
 		}
 
-		public SignatureValidationInspector(IConsumerStore consumerStore, IOAuthContextSigner signer)
-		{
-			_consumerStore = consumerStore;
-			_signer = signer;
-		}
-
-		public virtual void InspectContext(ProviderPhase phase, IOAuthContext context)
-		{
-			var signingContext = CreateSignatureContextForConsumer(context);
-
-			if (!_signer.ValidateSignature(context, signingContext))
-			{
-				throw Error.FailedToValidateSignature(context);
-			}
-		}
-
-		protected virtual bool SignatureMethodRequiresCertificate(string signatureMethod)
-		{
-			return ((signatureMethod != SignatureMethod.HmacSha1) && (signatureMethod != SignatureMethod.PlainText));
-		}
-
-		protected virtual SigningContext CreateSignatureContextForConsumer(IOAuthContext context)
-		{
-			var signingContext = new SigningContext {ConsumerSecret = _consumerStore.GetConsumerSecret(context)};
-
-			if (SignatureMethodRequiresCertificate(context.SignatureMethod))
-			{
-				signingContext.Algorithm = _consumerStore.GetConsumerPublicKey(context);				
-			}
-
-			return signingContext;
-		}
+		return signingContext;
 	}
 }

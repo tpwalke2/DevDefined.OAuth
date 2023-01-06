@@ -29,37 +29,36 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
-namespace DevDefined.OAuth.Framework
-{
-	public static class With
-	{
-		public static IDisposable NoCertificateValidation()
-		{
-			var oldCallback = ServicePointManager.ServerCertificateValidationCallback;
-			ServicePointManager.ServerCertificateValidationCallback = CertificateAlwaysValidCallback;
-			return new DisposableAction(delegate { ServicePointManager.ServerCertificateValidationCallback = oldCallback; });
-		}
+namespace DevDefined.OAuth.Framework;
 
-		static bool CertificateAlwaysValidCallback(object sender, X509Certificate certificate, X509Chain chain,
-		                                           SslPolicyErrors sslPolicyErrors)
-		{
-			return true;
-		}
+public static class With
+{
+	public static IDisposable NoCertificateValidation()
+	{
+		var oldCallback = ServicePointManager.ServerCertificateValidationCallback;
+		ServicePointManager.ServerCertificateValidationCallback = CertificateAlwaysValidCallback;
+		return new DisposableAction(delegate { ServicePointManager.ServerCertificateValidationCallback = oldCallback; });
 	}
 
-	public class DisposableAction : IDisposable
+	static bool CertificateAlwaysValidCallback(object sender, X509Certificate certificate, X509Chain chain,
+		SslPolicyErrors sslPolicyErrors)
 	{
-		readonly Action _action;
+		return true;
+	}
+}
 
-		public DisposableAction(Action action)
-		{
-			if (action == null) throw new ArgumentNullException("action");
-			_action = action;
-		}
+public class DisposableAction : IDisposable
+{
+	readonly Action _action;
 
-		public void Dispose()
-		{
-			_action();
-		}
+	public DisposableAction(Action action)
+	{
+		if (action == null) throw new ArgumentNullException("action");
+		_action = action;
+	}
+
+	public void Dispose()
+	{
+		_action();
 	}
 }

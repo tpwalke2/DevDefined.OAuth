@@ -27,16 +27,15 @@
 using System;
 using DevDefined.OAuth.Framework;
 
-namespace DevDefined.OAuth.Storage.Basic
+namespace DevDefined.OAuth.Storage.Basic;
+
+/// <summary>
+/// Simple access token model, this would hold information required to enforce policies such as expiration, and association
+/// with a user accout or other information regarding the information the consumer has been granted access to.
+/// </summary>
+public class AccessToken : TokenBase
 {
-	/// <summary>
-	/// Simple access token model, this would hold information required to enforce policies such as expiration, and association
-	/// with a user accout or other information regarding the information the consumer has been granted access to.
-	/// </summary>
-	public class AccessToken : TokenBase
-	{
-		public string UserName { get; set; }
-		public string[] Roles { get; set; }
-		public DateTime ExpiryDate { get; set; }
-	}
+	public string UserName { get; set; }
+	public string[] Roles { get; set; }
+	public DateTime ExpiryDate { get; set; }
 }

@@ -24,14 +24,13 @@
 
 #endregion
 
-namespace DevDefined.OAuth.Provider.Inspectors
+namespace DevDefined.OAuth.Provider.Inspectors;
+
+public enum ProviderPhase
 {
-	public enum ProviderPhase
-	{
-		GrantRequestToken,
-		ExchangeRequestTokenForAccessToken,
-		AccessProtectedResourceRequest,
-		RenewAccessToken,
-	  CreateAccessToken
-	}
+	GrantRequestToken,
+	ExchangeRequestTokenForAccessToken,
+	AccessProtectedResourceRequest,
+	RenewAccessToken,
+	CreateAccessToken
 }

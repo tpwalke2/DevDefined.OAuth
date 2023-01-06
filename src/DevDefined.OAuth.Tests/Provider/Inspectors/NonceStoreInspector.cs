@@ -30,39 +30,38 @@ using DevDefined.OAuth.Storage;
 using Moq;
 using Xunit;
 
-namespace DevDefined.OAuth.Tests.Provider.Inspectors
+namespace DevDefined.OAuth.Tests.Provider.Inspectors;
+
+public class NonceStoreInspectorTests
 {
-	public class NonceStoreInspectorTests
+	[Fact]
+	public void InspectContextForRepeatedNonceThrows()
 	{
-		[Fact]
-		public void InspectContextForRepeatedNonceThrows()
-		{
-			var nonceStore = new Mock<INonceStore>();
+		var nonceStore = new Mock<INonceStore>();
 
-			var context = new OAuthContext {Nonce = "1"};
+		var context = new OAuthContext {Nonce = "1"};
 
-			nonceStore.Setup(stub => stub.RecordNonceAndCheckIsUnique(context, "1")).Returns(false);
+		nonceStore.Setup(stub => stub.RecordNonceAndCheckIsUnique(context, "1")).Returns(false);
 
-			var inspector = new NonceStoreInspector(nonceStore.Object);
+		var inspector = new NonceStoreInspector(nonceStore.Object);
 
-			var ex = Assert.Throws<OAuthException>(() => inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
+		var ex = Assert.Throws<OAuthException>(() => inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
 
-			Assert.Equal("The nonce value \"1\" has already been used", ex.Message);
-		}
+		Assert.Equal("The nonce value \"1\" has already been used", ex.Message);
+	}
 
-		[Fact]
-		public void InspectContextForUniqueNoncePasses()
-		{
-			var nonceStore = new Mock<INonceStore>();
+	[Fact]
+	public void InspectContextForUniqueNoncePasses()
+	{
+		var nonceStore = new Mock<INonceStore>();
 
-			var context = new OAuthContext {Nonce = "2"};
+		var context = new OAuthContext {Nonce = "2"};
 
-			nonceStore.Setup(stub => stub.RecordNonceAndCheckIsUnique(context, "2")).Returns(true);
+		nonceStore.Setup(stub => stub.RecordNonceAndCheckIsUnique(context, "2")).Returns(true);
 
-			var inspector = new NonceStoreInspector(nonceStore.Object);
+		var inspector = new NonceStoreInspector(nonceStore.Object);
 
-			var ex = Record.Exception(() => inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
-			Assert.Null(ex);
-		}
+		var ex = Record.Exception(() => inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
+		Assert.Null(ex);
 	}
 }
