@@ -135,7 +135,7 @@ namespace DevDefined.OAuth.Tests.Framework
 
 			var report = new OAuthProblemReport(formatted);
 
-			Assert.Equal(report.Problem, OAuthProblems.ConsumerKeyRefused);
+			Assert.Equal(OAuthProblems.ConsumerKeyRefused, report.Problem);
 			Assert.Equal("The supplied consumer key has been black-listed due to complaints.", report.ProblemAdvice);
 		}
 
