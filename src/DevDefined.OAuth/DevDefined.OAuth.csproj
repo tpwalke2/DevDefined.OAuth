@@ -3,8 +3,8 @@
     <ProductVersion>10.0.30730</ProductVersion>
     <RootNamespace>DevDefined.OAuth</RootNamespace>
     <AssemblyName>DevDefined.OAuth</AssemblyName>
-    <TargetFramework>netstandard2.1</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>10</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
 </Project>

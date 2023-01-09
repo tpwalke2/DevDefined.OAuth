@@ -51,5 +51,28 @@ namespace DevDefined.OAuth.Framework
 			provider.ImportParameters(parameters);
 			return x509.CopyWithPrivateKey(provider);
 		}
+
+#if NETSTANDARD2_0
+		// TODO target .NET Standard 2.1 exclusively and remove this code block
+		// converting https://stackoverflow.com/a/69261768 to extension method
+		private static Func<X509Certificate2, RSA, X509Certificate2> s_copyWithRsa = FindCopyWithRsa();
+
+		private static Func<X509Certificate2, RSA, X509Certificate2> FindCopyWithRsa()
+		{
+			var info = typeof(RSACertificateExtensions).GetMethod("CopyWithPrivateKey");
+
+			if (info == null)
+			{
+				return (_, _) =>
+					throw new PlatformNotSupportedException("The CopyWithPrivateKey method was not found");
+			}
+
+			return (Func<X509Certificate2, RSA, X509Certificate2>)info.CreateDelegate(
+				typeof(Func<X509Certificate2, RSA, X509Certificate2>));
+		}
+
+		private static X509Certificate2 CopyWithPrivateKey(this X509Certificate2 cert, RSA provider) =>
+			s_copyWithRsa(cert, provider);
+#endif
 	}
 }
