@@ -51,7 +51,7 @@ namespace DevDefined.OAuth.Tests.Framework
 			List<QueryParameter> parameters =
 				UriUtility.GetHeaderParameters("realm=\"http:\\somerealm.com\", oauth_consumer_key=\"\"");
 
-			Assert.Equal(0, parameters.Count);
+			Assert.Empty(parameters);
 		}
 
 		[Fact]

@@ -28,7 +28,7 @@ using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Framework.Signing;
 using DevDefined.OAuth.Provider.Inspectors;
 using DevDefined.OAuth.Storage;
-using Rhino.Mocks;
+using Moq;
 using Xunit;
 
 namespace DevDefined.OAuth.Tests.Provider.Inspectors
@@ -38,67 +38,62 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 		[Fact]
 		public void InvalidSignatureThrows()
 		{
-			var repository = new MockRepository();
+			var consumerStore = new Mock<IConsumerStore>();
+			var signer = new Mock<IOAuthContextSigner>();
 
-			var consumerStore = repository.DynamicMock<IConsumerStore>();
-			var signer = repository.StrictMock<IOAuthContextSigner>();
+			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText };
 
-			var context = new OAuthContext {ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText};
+			signer.Setup(contextSigner => contextSigner.ValidateSignature(
+					It.IsAny<IOAuthContext>(),
+					It.IsAny<SigningContext>()))
+				.Returns(false);
 
-			using (repository.Record())
-			{
-				Expect.Call(signer.ValidateSignature(null, null)).IgnoreArguments().Return(false);
-			}
-			using (repository.Playback())
-			{
-				var inspector = new SignatureValidationInspector(consumerStore, signer);
-				var ex = Assert.Throws<OAuthException>(() => inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
-				Assert.Equal("Failed to validate signature", ex.Message);
-			}
+			var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
+			var ex = Assert.Throws<OAuthException>(() =>
+				inspector.InspectContext(ProviderPhase.GrantRequestToken, context));
+			Assert.Equal("Failed to validate signature", ex.Message);
+			
+			signer.Verify(contextSigner => contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
 		}
 
 		[Fact]
 		public void PlainTextSignatureMethodDoesNotFetchCertificate()
 		{
-			var repository = new MockRepository();
+			var consumerStore = new Mock<IConsumerStore>();
+			var signer = new Mock<IOAuthContextSigner>();
 
-			var consumerStore = repository.DynamicMock<IConsumerStore>();
-			var signer = repository.StrictMock<IOAuthContextSigner>();
+			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText };
 
-			var context = new OAuthContext {ConsumerKey = "key", SignatureMethod = SignatureMethod.PlainText};
+			signer.Setup(contextSigner => contextSigner.ValidateSignature(
+					It.IsAny<IOAuthContext>(),
+					It.IsAny<SigningContext>()))
+				.Returns(true);
 
-			using (repository.Record())
-			{
-				Expect.Call(signer.ValidateSignature(null, null)).IgnoreArguments().Return(true);
-			}
-			using (repository.Playback())
-			{
-				var inspector = new SignatureValidationInspector(consumerStore, signer);
-				inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
-			}
+			var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
+			inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
+			
+			signer.Verify(contextSigner => contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
 		}
 
 		[Fact]
 		public void RsaSha1SignatureMethodFetchesCertificate()
 		{
-			var repository = new MockRepository();
+			var consumerStore = new Mock<IConsumerStore>();
+			var signer = new Mock<IOAuthContextSigner>();
 
-			var consumerStore = repository.DynamicMock<IConsumerStore>();
-			var signer = repository.StrictMock<IOAuthContextSigner>();
+			var context = new OAuthContext { ConsumerKey = "key", SignatureMethod = SignatureMethod.RsaSha1 };
 
-			var context = new OAuthContext {ConsumerKey = "key", SignatureMethod = SignatureMethod.RsaSha1};
+			consumerStore.Setup(store => store.GetConsumerPublicKey(context))
+				.Returns(TestCertificates.OAuthTestCertificate().PublicKey.GetRSAPublicKey());
+			signer.Setup(contextSigner =>
+				contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>())).Returns(true);
 
-			using (repository.Record())
-			{
-				Expect.Call(consumerStore.GetConsumerPublicKey(context)).Return(
-					TestCertificates.OAuthTestCertificate().PublicKey.Key);
-				Expect.Call(signer.ValidateSignature(null, null)).IgnoreArguments().Return(true);
-			}
-			using (repository.Playback())
-			{
-				var inspector = new SignatureValidationInspector(consumerStore, signer);
-				inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
-			}
+			var inspector = new SignatureValidationInspector(consumerStore.Object, signer.Object);
+			inspector.InspectContext(ProviderPhase.GrantRequestToken, context);
+
+			consumerStore.Verify(store => store.GetConsumerPublicKey(context));
+			signer.Verify(contextSigner =>
+				contextSigner.ValidateSignature(It.IsAny<IOAuthContext>(), It.IsAny<SigningContext>()));
 		}
 	}
 }

@@ -45,7 +45,8 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 			              		SignatureMethod = SignatureMethod.PlainText
 			              	};
 
-			Assert.DoesNotThrow(() => inspector.InspectContext(ProviderPhase.AccessProtectedResourceRequest, context));
+			var ex = Record.Exception(() => inspector.InspectContext(ProviderPhase.AccessProtectedResourceRequest, context));
+			Assert.Null(ex);
 		}
 
 		[Fact]
@@ -73,7 +74,8 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 			              		SignatureMethod = SignatureMethod.HmacSha1
 			              	};
 
-			Assert.DoesNotThrow(() => inspector.InspectContext(ProviderPhase.AccessProtectedResourceRequest, context));
+			var ex = Record.Exception(() => inspector.InspectContext(ProviderPhase.AccessProtectedResourceRequest, context));
+			Assert.Null(ex);
 		}
 
 		[Fact]
@@ -86,7 +88,8 @@ namespace DevDefined.OAuth.Tests.Provider.Inspectors
 			              		SignatureMethod = SignatureMethod.HmacSha1
 			              	};
 
-			Assert.DoesNotThrow(() => inspector.InspectContext(ProviderPhase.AccessProtectedResourceRequest, context));
+			var ex = Record.Exception(() => inspector.InspectContext(ProviderPhase.AccessProtectedResourceRequest, context));
+			Assert.Null(ex);
 		}
 
 		[Fact]
